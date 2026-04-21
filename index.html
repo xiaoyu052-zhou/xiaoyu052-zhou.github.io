@@ -4,6 +4,202 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>梦境手札 · Dream Journal</title>
+/* ========== Phone Frame (Mobile-First) ========== */
+body {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+}
+.app-container {
+  padding: 12px 16px 80px;
+  max-width: 100%;
+}
+.app-header { padding: 20px 0 14px; }
+.app-header h1 { font-size: 1.6em; letter-spacing: 3px; }
+.app-header .subtitle { font-size: 0.75em; }
+
+/* ========== Bottom Tab Bar ========== */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%; max-width: 480px;
+  display: flex; z-index: 100;
+  background: rgba(15,12,41,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 6px 0 env(safe-area-inset-bottom, 8px);
+}
+.bottom-bar .tab-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
+  padding: 8px 0;
+  background: none; border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.65em; cursor: pointer;
+  transition: color 0.3s;
+}
+.bottom-bar .tab-item .tab-icon { font-size: 1.8em; line-height: 1; }
+.bottom-bar .tab-item.active { color: var(--accent-pink); }
+.bottom-bar .tab-item:hover { color: rgba(255,255,255,0.7); }
+
+/* ========== Profile Page (My) ========== */
+.profile-header {
+  text-align: center; padding: 24px 0 20px;
+}
+.profile-avatar-wrap {
+  width: 90px; height: 90px; margin: 0 auto 12px;
+  border-radius: 50%; position: relative;
+  overflow: hidden; cursor: pointer;
+  border: 2px solid var(--accent-pink);
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.3s;
+}
+.profile-avatar-wrap:hover { transform: scale(1.05); }
+.profile-avatar-wrap img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.profile-avatar-wrap .avatar-placeholder {
+  font-size: 2.5em; opacity: 0.4;
+}
+.profile-avatar-wrap .avatar-edit {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,0.6);
+  color: #fff; font-size: 0.6em;
+  text-align: center; padding: 3px 0;
+}
+.profile-name {
+  font-size: 1.1em; font-weight: 500;
+}
+.profile-name-input {
+  background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.3);
+  color: #fff; font-size: 1.1em; text-align: center;
+  outline: none; width: 200px; padding: 4px 0;
+}
+.profile-name-input:focus { border-color: var(--accent-pink); }
+
+/* ========== Persona Cards ========== */
+.persona-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px; margin-top: 16px;
+}
+.persona-card {
+  padding: 16px; position: relative;
+  transition: all 0.3s;
+}
+.persona-card:hover { transform: translateY(-2px); }
+.persona-card .persona-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.persona-card .persona-name {
+  font-size: 0.95em; font-weight: 500;
+}
+.persona-card .persona-actions {
+  display: flex; gap: 6px;
+}
+.persona-card .persona-actions button {
+  background: rgba(255,255,255,0.08); border: none;
+  color: var(--text-secondary); padding: 4px 10px;
+  border-radius: 6px; cursor: pointer; font-size: 0.75em;
+  transition: all 0.2s;
+}
+.persona-card .persona-actions button:hover { background: rgba(255,255,255,0.15); color: #fff; }
+.persona-card .persona-actions .btn-del:hover { color: var(--danger); }
+.persona-card .persona-text {
+  font-size: 0.82em; color: var(--text-secondary);
+  line-height: 1.7; white-space: pre-wrap;
+  max-height: 120px; overflow: hidden;
+  position: relative;
+}
+.persona-card .persona-text.expanded { max-height: none; }
+.persona-card .persona-text::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 40px;
+  background: linear-gradient(transparent, rgba(20,10,40,0.9));
+  pointer-events: none;
+}
+.persona-card .persona-text.expanded::after { display: none; }
+.persona-card .btn-expand {
+  background: none; border: none;
+  color: var(--accent-pink); font-size: 0.72em;
+  cursor: pointer; margin-top: 4px; padding: 0;
+}
+.persona-card .persona-linked {
+  font-size: 0.7em; color: var(--text-secondary);
+  margin-top: 8px; opacity: 0.7;
+}
+
+.btn-add-persona {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 14px; border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.05);
+  border: 1px dashed rgba(255,255,255,0.2);
+  color: var(--text-secondary); cursor: pointer;
+  font-size: 0.9em; transition: all 0.3s;
+  margin-top: 12px;
+}
+.btn-add-persona:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.35);
+  color: #fff;
+}
+
+/* ========== Persona Modal ========== */
+.persona-modal { max-width: 420px; }
+.persona-modal textarea {
+  width: 100%; min-height: 200px; padding: 12px 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-sm);
+  color: #fff; font-size: 0.9em;
+  outline: none; resize: vertical;
+  line-height: 1.7; transition: border-color 0.3s;
+  font-family: inherit;
+}
+.persona-modal textarea:focus { border-color: var(--accent-pink); }
+.persona-modal textarea::placeholder { color: rgba(255,255,255,0.25); }
+
+/* ========== Persona Link in Editor ========== */
+.persona-link-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  margin-bottom: 6px; transition: all 0.2s;
+}
+.persona-link-item:hover { background: rgba(255,255,255,0.08); }
+.persona-link-item input[type="checkbox"] {
+  accent-color: var(--accent-purple);
+  width: 16px; height: 16px;
+}
+.persona-link-item .link-name {
+  font-size: 0.85em; cursor: pointer; flex: 1;
+}
+.persona-link-item .link-tag {
+  font-size: 0.65em; padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(179,157,219,0.2);
+  color: var(--accent-purple);
+}
+
+/* ========== Responsive Override for Mobile ========== */
+@media (max-width: 480px) {
+  .editor-layout { flex-direction: column; }
+  .editor-sidebar { width: 100%; }
+  .action-cards { flex-direction: row; }
+  .action-card { min-width: 0; padding: 20px 16px; }
+  .action-card .icon { font-size: 1.6em; }
+  .action-card .label { font-size: 0.8em; }
+  .album-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .album-card .album-cover { height: 120px; }
+  .storyline-grid { grid-template-columns: 1fr; }
+  .image-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .editor-content { min-height: 300px; }
+  .timeline-node .node-card { width: 80px; padding: 10px 6px; }
+}
 <style>
 /* ========== Reset & Base ========== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -837,7 +1033,29 @@ body {
       <div>还没有故事线，点击上方「新建故事线」开始创作</div>
     </div>
   </div>
+  <!-- ==================== PROFILE VIEW (MY) ==================== -->
+  <div id="profileView" class="view">
+    <div class="profile-header">
+      <div class="profile-avatar-wrap" onclick="changeAvatar()">
+        <img id="profileAvatar" src="" alt="" style="display:none;">
+        <div class="avatar-placeholder" id="avatarPlaceholder">&#128100;</div>
+        <div class="avatar-edit">更换头像</div>
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this.files)">
+      <div class="profile-name">
+        <input class="profile-name-input" id="profileName" value="梦旅人" 
+               onchange="saveProfileName()" placeholder="点击修改昵称">
+      </div>
+    </div>
 
+    <div class="section-title">&#128221; 我的人设</div>
+    <div id="personaGrid" class="persona-grid"></div>
+    <div id="personaEmpty" class="empty-state" style="display:none;">
+      <div class="empty-icon">&#128221;</div>
+      <div>还没有人设，点击下方添加</div>
+    </div>
+    <button class="btn-add-persona" onclick="addPersona()">+ 添加人设</button>
+  </div>
   <!-- ==================== ALBUM DETAIL VIEW ==================== -->
   <div id="albumView" class="view">
     <div class="album-detail-header glass">
@@ -908,7 +1126,17 @@ body {
     </div>
   </div>
 </div>
-
+<!-- ==================== BOTTOM NAV BAR ==================== -->
+<div class="bottom-bar">
+  <button class="tab-item active" data-tab="mainView" onclick="switchTab('mainView', this)">
+    <div class="tab-icon">&#127968;</div>
+    <span>首页</span>
+  </button>
+  <button class="tab-item" data-tab="profileView" onclick="switchTab('profileView', this)">
+    <div class="tab-icon">&#128100;</div>
+    <span>我的</span>
+  </button>
+</div>
 <!-- ==================== MODALS ==================== -->
 
 <!-- Storyline Type Modal -->
@@ -987,7 +1215,21 @@ body {
     </div>
   </div>
 </div>
-
+<!-- Persona Edit Modal -->
+<div id="personaModal" class="modal-overlay">
+  <div class="modal glass persona-modal">
+    <h3 id="personaModalTitle">&#128221; 新建人设</h3>
+    <input type="text" id="personaNameField" placeholder="人设名称（如：女主/梦角）" 
+           style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.08);
+           border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;
+           font-size:0.95em;outline:none;margin-bottom:12px;">
+    <textarea id="personaTextField" placeholder="在这里写下人设描述，字数不限...&#10;&#10;例如：&#10;姓名：&#10;性格：&#10;外貌：&#10;背景故事：&#10;特殊能力："></textarea>
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn-cancel" onclick="closeModal('personaModal')">取消</button>
+      <button class="btn-confirm" id="personaModalConfirm">确认</button>
+    </div>
+  </div>
+</div>
 <!-- Lightbox -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox()">
   <img id="lightboxImg" src="" alt="">
@@ -1897,10 +2139,11 @@ function timeAgo(ts) {
 }
 
 // ==================== Init ====================
+// ==================== Init ====================
 renderCategories();
 renderAlbums();
 renderStorylines();
-
+renderProfile();
 // Keyboard shortcut: Escape to close modals
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
@@ -1918,6 +2161,345 @@ document.addEventListener('keydown', (e) => {
     }
   }
 });
+// ==================== Bottom Navigation ====================
+function switchTab(tabId, btn) {
+  // Save any pending editor content
+  if (currentStorylineId && currentChapterId) {
+    const s = appData.storylines.find(x => x.id === currentStorylineId);
+    if (s) {
+      const ch = s.chapters.find(c => c.id === currentChapterId);
+      if (ch) ch.content = document.getElementById('editorContent').innerHTML;
+      s.updatedAt = Date.now();
+      saveData();
+    }
+    currentStorylineId = null;
+    currentChapterId = null;
+  }
+  if (currentAlbumId) currentAlbumId = null;
+
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+
+  document.querySelectorAll('.bottom-bar .tab-item').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  // Re-render data when switching tabs
+  if (tabId === 'mainView') {
+    renderAlbums();
+    renderStorylines();
+  } else if (tabId === 'profileView') {
+    renderProfile();
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ==================== Profile ====================
+function getProfile() {
+  if (!appData.profile) {
+    appData.profile = {
+      name: '梦旅人',
+      avatar: '',
+      personas: []
+    };
+    saveData();
+  }
+  return appData.profile;
+}
+
+function renderProfile() {
+  const profile = getProfile();
+
+  // Avatar
+  const avatarImg = document.getElementById('profileAvatar');
+  const placeholder = document.getElementById('avatarPlaceholder');
+  if (profile.avatar) {
+    avatarImg.src = profile.avatar;
+    avatarImg.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    avatarImg.style.display = 'none';
+    placeholder.style.display = 'block';
+  }
+
+  // Name
+  document.getElementById('profileName').value = profile.name || '梦旅人';
+
+  // Personas
+  renderPersonas();
+}
+
+function changeAvatar() {
+  document.getElementById('avatarInput').click();
+}
+
+function handleAvatarUpload(files) {
+  if (!files || !files[0]) return;
+  const file = files[0];
+  if (!file.type.startsWith('image/')) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const profile = getProfile();
+    profile.avatar = e.target.result;
+    saveData();
+    renderProfile();
+    showToast('头像已更新');
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProfileName() {
+  const profile = getProfile();
+  profile.name = document.getElementById('profileName').value.trim() || '梦旅人';
+  saveData();
+  showToast('昵称已保存');
+}
+
+// ==================== Personas ====================
+function renderPersonas() {
+  const profile = getProfile();
+  const grid = document.getElementById('personaGrid');
+  const empty = document.getElementById('personaEmpty');
+
+  if (!profile.personas || profile.personas.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = profile.personas.map(p => {
+    // Find which storylines this persona is linked to
+    const linkedStories = appData.storylines.filter(s =>
+      s.linkedPersonas && s.linkedPersonas.includes(p.id)
+    );
+    const linkedNames = linkedStories.map(s => s.name).join('、');
+
+    const isLong = (p.text || '').length > 200;
+
+    return `<div class="persona-card glass-sm" data-id="${p.id}">
+      <div class="persona-header">
+        <div class="persona-name">${escHtml(p.name)}</div>
+        <div class="persona-actions">
+          <button onclick="editPersona(${p.id})">&#9998; 编辑</button>
+          <button class="btn-del" onclick="deletePersona(${p.id})">&#128465;</button>
+        </div>
+      </div>
+      <div class="persona-text" id="personaText${p.id}">${escHtml(p.text || '')}</div>
+      ${isLong ? `<button class="btn-expand" onclick="togglePersonaExpand(${p.id})">展开全部</button>` : ''}
+      ${linkedNames ? `<div class="persona-linked">&#128279; 关联故事线: ${escHtml(linkedNames)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function togglePersonaExpand(id) {
+  const el = document.getElementById('personaText' + id);
+  const btn = el.nextElementSibling;
+  if (el.classList.contains('expanded')) {
+    el.classList.remove('expanded');
+    btn.textContent = '展开全部';
+  } else {
+    el.classList.add('expanded');
+    btn.textContent = '收起';
+  }
+}
+
+function addPersona() {
+  document.getElementById('personaModalTitle').innerHTML = '&#128221; 新建人设';
+  document.getElementById('personaNameField').value = '';
+  document.getElementById('personaTextField').value = '';
+
+  document.getElementById('personaModalConfirm').onclick = () => {
+    const name = document.getElementById('personaNameField').value.trim();
+    const text = document.getElementById('personaTextField').value;
+    if (!name) { showToast('请输入人设名称'); return; }
+
+    const profile = getProfile();
+    if (!profile.personas) profile.personas = [];
+    profile.personas.push({
+      id: genId(),
+      name,
+      text,
+      createdAt: Date.now()
+    });
+    saveData();
+    closeModal('personaModal');
+    renderPersonas();
+    showToast('人设已添加');
+  };
+  openModal('personaModal');
+}
+
+function editPersona(id) {
+  const profile = getProfile();
+  const p = profile.personas.find(x => x.id === id);
+  if (!p) return;
+
+  document.getElementById('personaModalTitle').innerHTML = '&#9998; 编辑人设';
+  document.getElementById('personaNameField').value = p.name;
+  document.getElementById('personaTextField').value = p.text || '';
+
+  document.getElementById('personaModalConfirm').onclick = () => {
+    const name = document.getElementById('personaNameField').value.trim();
+    const text = document.getElementById('personaTextField').value;
+    if (!name) { showToast('请输入人设名称'); return; }
+
+    p.name = name;
+    p.text = text;
+    saveData();
+    closeModal('personaModal');
+    renderPersonas();
+    renderPersonaLinks(); // update links if editor is open
+    showToast('人设已更新');
+  };
+  openModal('personaModal');
+}
+
+function deletePersona(id) {
+  const profile = getProfile();
+  const p = profile.personas.find(x => x.id === id);
+  if (!p) return;
+
+  showConfirm('删除人设', `确定要删除人设「${p.name}」吗？`, () => {
+    profile.personas = profile.personas.filter(x => x.id !== id);
+    // Remove from storyline links
+    appData.storylines.forEach(s => {
+      if (s.linkedPersonas) s.linkedPersonas = s.linkedPersonas.filter(pid => pid !== id);
+    });
+    saveData();
+    renderPersonas();
+    renderPersonaLinks();
+    showToast('人设已删除');
+  });
+}
+
+// ==================== Persona Links in Storyline Editor ====================
+function renderPersonaLinks() {
+  const profile = getProfile();
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+
+  // Find existing persona section or create it
+  let section = document.getElementById('personaLinkSection');
+  if (!section) {
+    // Insert after album link section
+    const albumLinkSection = document.querySelector('.editor-sidebar .sidebar-section:first-child');
+    if (!albumLinkSection) return;
+
+    section = document.createElement('div');
+    section.id = 'personaLinkSection';
+    section.className = 'sidebar-section glass-sm';
+    albumLinkSection.parentNode.insertBefore(section, albumLinkSection.nextSibling);
+  }
+
+  if (!profile.personas || profile.personas.length === 0) {
+    section.innerHTML = '<h4>&#128221; 关联人设</h4><div style="font-size:0.8em;color:var(--text-secondary);">暂无人设，去「我的」页面添加</div>';
+    return;
+  }
+
+  section.innerHTML = `<h4>&#128221; 关联人设</h4>` +
+    profile.personas.map(p => {
+      const checked = (s.linkedPersonas || []).includes(p.id) ? 'checked' : '';
+      return `<div class="persona-link-item">
+        <input type="checkbox" ${checked} onchange="togglePersonaLink(${p.id}, this.checked)">
+        <span class="link-name" onclick="this.previousElementSibling.click()">${escHtml(p.name)}</span>
+        <span class="link-tag">人设</span>
+      </div>`;
+    }).join('');
+}
+
+function togglePersonaLink(personaId, checked) {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+  if (!s.linkedPersonas) s.linkedPersonas = [];
+  if (checked) {
+    if (!s.linkedPersonas.includes(personaId)) s.linkedPersonas.push(personaId);
+  } else {
+    s.linkedPersonas = s.linkedPersonas.filter(id => id !== personaId);
+  }
+  s.updatedAt = Date.now();
+  saveData();
+}
+
+// ==================== Override openStoryline to also render persona links ====================
+const _origOpenStoryline = openStoryline;
+openStoryline = function(id) {
+  _origOpenStoryline(id);
+  renderPersonaLinks();
+};
+
+// ==================== Override goBack to handle tab visibility ====================
+const _origGoBack = goBack;
+goBack = function() {
+  // Save content
+  if (currentStorylineId && currentChapterId) {
+    const s = appData.storylines.find(x => x.id === currentStorylineId);
+    if (s) {
+      const ch = s.chapters.find(c => c.id === currentChapterId);
+      if (ch) ch.content = document.getElementById('editorContent').innerHTML;
+      s.updatedAt = Date.now();
+      saveData();
+    }
+    currentStorylineId = null;
+    currentChapterId = null;
+  }
+  if (currentAlbumId) currentAlbumId = null;
+
+  // Go back to main view and show bottom bar
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('mainView').classList.add('active');
+  document.querySelectorAll('.bottom-bar .tab-item').forEach(t => t.classList.remove('active'));
+  document.querySelector('.bottom-bar .tab-item[data-tab="mainView"]').classList.add('active');
+
+  renderAlbums();
+  renderStorylines();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// ==================== Hide bottom bar on sub-views ====================
+const _origSwitchView = switchView;
+switchView = function(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Hide bottom bar on detail views
+  const bar = document.querySelector('.bottom-bar');
+  if (viewId === 'mainView' || viewId === 'profileView') {
+    bar.style.display = 'flex';
+  } else {
+    bar.style.display = 'none';
+  }
+};
+
+// ==================== Update storyline cards to show linked personas ====================
+const _origRenderStorylines = renderStorylines;
+renderStorylines = function() {
+  _origRenderStorylines();
+
+  // Append persona info to storyline cards
+  const stories = getFilteredStorylines();
+  const cards = document.querySelectorAll('.storyline-card');
+  cards.forEach((card, idx) => {
+    const s = stories[idx];
+    if (!s || !s.linkedPersonas || s.linkedPersonas.length === 0) return;
+    const profile = getProfile();
+    const personaNames = s.linkedPersonas.map(pid => {
+      const p = profile.personas.find(x => x.id === pid);
+      return p ? p.name : null;
+    }).filter(Boolean).join('、');
+    if (personaNames) {
+      const meta = card.querySelector('.story-meta');
+      if (meta) {
+        const span = document.createElement('span');
+        span.style.color = 'var(--accent-purple)';
+        span.innerHTML = '&#128221; 人设: ' + escHtml(personaNames);
+        meta.appendChild(span);
+      }
+    }
+  });
+};
 </script>
 </body>
 </html>

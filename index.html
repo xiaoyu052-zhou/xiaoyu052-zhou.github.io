@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>梦境手札 · Dream Journal</title>
+<style>
+/* ========== Reset & Base ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --glass-bg: rgba(255,255,255,0.12);
+  --glass-border: rgba(255,255,255,0.25);
+  --glass-shadow: rgba(31,38,135,0.15);
+  --blur: 16px;
+  --accent-gold: #ffd700;
+  --accent-silver: #c0c8e0;
+  --accent-pink: #f7a8c4;
+  --accent-purple: #b39ddb;
+  --danger: #ff6b6b;
+  --text-primary: #fff;
+  --text-secondary: rgba(255,255,255,0.75);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+body {
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a0533 0%, #2d1b69 25%, #1e3a5f 50%, #2a0845 75%, #0f0c29 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+/* ========== Background Animation ========== */
+.bg-orbs {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0; overflow: hidden;
+}
+.bg-orbs .orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.35;
+  animation: float 20s ease-in-out infinite;
+}
+.bg-orbs .orb:nth-child(1) { width: 500px; height: 500px; background: #7b2ff7; top: -10%; left: -5%; animation-duration: 22s; }
+.bg-orbs .orb:nth-child(2) { width: 400px; height: 400px; background: #f472b6; top: 50%; right: -8%; animation-duration: 18s; animation-delay: -5s; }
+.bg-orbs .orb:nth-child(3) { width: 350px; height: 350px; background: #3b82f6; bottom: -5%; left: 30%; animation-duration: 25s; animation-delay: -10s; }
+.bg-orbs .orb:nth-child(4) { width: 280px; height: 280px; background: #a78bfa; top: 20%; left: 60%; animation-duration: 20s; animation-delay: -3s; }
+.bg-orbs .orb:nth-child(5) { width: 200px; height: 200px; background: #ec4899; bottom: 20%; right: 20%; animation-duration: 16s; animation-delay: -8s; }
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -40px) scale(1.05); }
+  50% { transform: translate(-20px, 20px) scale(0.95); }
+  75% { transform: translate(40px, 30px) scale(1.03); }
+}
+
+/* ========== Glass Components ========== */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px 0 var(--glass-shadow);
+}
+
+.glass-sm {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px 0 var(--glass-shadow);
+}
+
+/* ========== Layout ========== */
+.app-container {
+  position: relative; z-index: 1;
+  max-width: 1200px; margin: 0 auto;
+  padding: 20px 24px 60px;
+}
+
+/* ========== Header ========== */
+.app-header {
+  text-align: center; padding: 40px 0 30px;
+}
+.app-header h1 {
+  font-size: 2.4em; font-weight: 300;
+  letter-spacing: 6px;
+  background: linear-gradient(135deg, #f7a8c4, #b39ddb, #93c5fd);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.app-header .subtitle {
+  font-size: 0.85em; color: var(--text-secondary);
+  letter-spacing: 4px; margin-top: 6px;
+}
+
+/* ========== Category Bar ========== */
+.category-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px; margin-bottom: 28px;
+  overflow-x: auto; scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+.category-bar::-webkit-scrollbar { height: 4px; }
+.category-bar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+.category-tag {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 18px; border-radius: 20px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer; white-space: nowrap;
+  font-size: 0.9em; transition: all 0.3s;
+  user-select: none;
+}
+.category-tag:hover { background: rgba(255,255,255,0.2); }
+.category-tag.active {
+  background: rgba(255,255,255,0.22);
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 12px rgba(247,168,196,0.3);
+}
+.category-tag .tag-name { cursor: text; }
+.category-tag .tag-delete {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; background: rgba(255,100,100,0.3);
+  border: none; color: #fff; cursor: pointer;
+  transition: background 0.2s; line-height: 1;
+}
+.category-tag .tag-delete:hover { background: rgba(255,100,100,0.6); }
+
+.btn-add-category {
+  padding: 8px 18px; border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  border: 1px dashed rgba(255,255,255,0.25);
+  color: var(--text-secondary); cursor: pointer;
+  font-size: 0.85em; white-space: nowrap;
+  transition: all 0.3s;
+}
+.btn-add-category:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff; border-color: rgba(255,255,255,0.4);
+}
+
+/* ========== Section Titles ========== */
+.section-title {
+  display: flex; align-items: center; gap: 12px;
+  margin: 28px 0 16px; font-size: 1.05em;
+  color: var(--text-secondary); letter-spacing: 1px;
+}
+.section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.15), transparent);
+}
+
+/* ========== Action Cards ========== */
+.action-cards {
+  display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+}
+.action-card {
+  flex: 1; min-width: 200px; padding: 28px 24px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 10px;
+  cursor: pointer; transition: all 0.3s;
+}
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(31,38,135,0.25);
+  background: rgba(255,255,255,0.18);
+}
+.action-card .icon { font-size: 2em; }
+.action-card .label { font-size: 0.95em; color: var(--text-secondary); }
+
+/* ========== Album Grid ========== */
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.album-card {
+  padding: 0; overflow: hidden;
+  cursor: pointer; transition: all 0.3s;
+  position: relative;
+}
+.album-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(31,38,135,0.3);
+}
+.album-card .album-cover {
+  width: 100%; height: 160px;
+  background: linear-gradient(135deg, rgba(179,157,219,0.3), rgba(147,197,253,0.3));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3em; color: rgba(255,255,255,0.5);
+  position: relative; overflow: hidden;
+}
+.album-card .album-cover img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.album-card .album-info {
+  padding: 12px 14px; display: flex;
+  justify-content: space-between; align-items: center;
+}
+.album-card .album-name {
+  font-size: 0.9em; font-weight: 500;
+  cursor: text;
+}
+.album-card .album-count {
+  font-size: 0.75em; color: var(--text-secondary);
+}
+.album-card .album-actions {
+  display: flex; gap: 6px;
+}
+.album-card .album-actions button {
+  background: none; border: none;
+  color: var(--text-secondary); cursor: pointer;
+  font-size: 0.85em; padding: 4px 6px;
+  border-radius: 4px; transition: all 0.2s;
+}
+.album-card .album-actions button:hover {
+  background: rgba(255,255,255,0.1); color: #fff;
+}
+.album-card .album-actions .btn-del:hover { color: var(--danger); }
+
+/* ========== Storyline Grid ========== */
+.storyline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.storyline-card {
+  padding: 20px; cursor: pointer;
+  transition: all 0.3s; position: relative;
+}
+.storyline-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(31,38,135,0.3);
+}
+.storyline-card.main-story {
+  border-left: 3px solid var(--accent-gold);
+}
+.storyline-card.if-story {
+  border-left: 3px solid var(--accent-silver);
+}
+.storyline-card .story-type {
+  font-size: 0.75em; text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 8px;
+}
+.storyline-card.main-story .story-type { color: var(--accent-gold); }
+.storyline-card.if-story .story-type { color: var(--accent-silver); }
+.storyline-card .story-name {
+  font-size: 1.1em; font-weight: 500; margin-bottom: 10px;
+}
+.storyline-card .story-meta {
+  font-size: 0.75em; color: var(--text-secondary);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.storyline-card .story-actions {
+  position: absolute; top: 12px; right: 12px;
+  display: flex; gap: 4px;
+}
+.storyline-card .story-actions button {
+  background: rgba(255,255,255,0.1); border: none;
+  color: var(--text-secondary); cursor: pointer;
+  font-size: 0.8em; padding: 4px 8px; border-radius: 6px;
+  transition: all 0.2s;
+}
+.storyline-card .story-actions button:hover { background: rgba(255,255,255,0.2); color: #fff; }
+.storyline-card .story-actions .btn-del:hover { color: var(--danger); }
+
+.storyline-card .btn-timeline {
+  display: inline-block; margin-top: 10px;
+  padding: 6px 14px; border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-secondary); font-size: 0.75em;
+  cursor: pointer; transition: all 0.2s;
+}
+.storyline-card .btn-timeline:hover {
+  background: rgba(255,255,255,0.15); color: #fff;
+}
+
+/* ========== Modal Overlay ========== */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%; z-index: 1000;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+
+.modal {
+  width: 90%; max-width: 460px;
+  padding: 32px; animation: modalIn 0.3s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal h3 {
+  text-align: center; font-size: 1.2em;
+  font-weight: 400; margin-bottom: 24px;
+  letter-spacing: 2px;
+}
+.modal-options {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.modal-option {
+  padding: 20px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.3s;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  display: flex; align-items: center; gap: 14px;
+}
+.modal-option:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateX(4px);
+}
+.modal-option .opt-icon { font-size: 1.6em; }
+.modal-option .opt-label { font-size: 1em; font-weight: 500; }
+.modal-option .opt-desc { font-size: 0.78em; color: var(--text-secondary); margin-top: 2px; }
+.modal-cancel {
+  display: block; margin: 20px auto 0;
+  padding: 10px 32px; border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-secondary); cursor: pointer;
+  font-size: 0.9em; transition: all 0.3s;
+}
+.modal-cancel:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* ========== Input Modal ========== */
+.input-modal { max-width: 400px; }
+.input-modal input[type="text"],
+.input-modal textarea,
+.input-modal select {
+  width: 100%; padding: 12px 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-sm);
+  color: #fff; font-size: 0.95em;
+  outline: none; transition: border-color 0.3s;
+}
+.input-modal select {
+  cursor: pointer;
+}
+.input-modal select option {
+  background: #2d1b69; color: #fff;
+}
+.input-modal input[type="text"]:focus,
+.input-modal textarea:focus,
+.input-modal select:focus {
+  border-color: var(--accent-pink);
+}
+.input-modal .btn-row {
+  display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px;
+}
+.input-modal .btn-confirm, .input-modal .btn-cancel {
+  padding: 10px 24px; border-radius: 20px;
+  border: none; cursor: pointer; font-size: 0.9em;
+  transition: all 0.3s;
+}
+.input-modal .btn-confirm {
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+  color: #fff;
+}
+.input-modal .btn-confirm:hover { opacity: 0.85; }
+.input-modal .btn-cancel {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-secondary);
+}
+.input-modal .btn-cancel:hover { background: rgba(255,255,255,0.15); }
+
+/* ========== Confirm Modal ========== */
+.confirm-modal { max-width: 360px; text-align: center; }
+.confirm-modal p { margin-bottom: 20px; font-size: 0.95em; line-height: 1.6; }
+.confirm-modal .btn-row { justify-content: center; }
+.confirm-modal .btn-danger {
+  padding: 10px 24px; border-radius: 20px;
+  border: none; cursor: pointer; font-size: 0.9em;
+  background: rgba(255,107,107,0.6); color: #fff;
+  transition: all 0.3s;
+}
+.confirm-modal .btn-danger:hover { background: rgba(255,107,107,0.8); }
+
+/* ========== Album Detail View ========== */
+.view { display: none; }
+.view.active { display: block; }
+
+.album-detail-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 24px; padding: 16px 20px;
+}
+.album-detail-header .btn-back {
+  background: rgba(255,255,255,0.1); border: none;
+  color: #fff; padding: 8px 14px; border-radius: 8px;
+  cursor: pointer; font-size: 0.9em; transition: all 0.2s;
+}
+.album-detail-header .btn-back:hover { background: rgba(255,255,255,0.2); }
+.album-detail-header .album-title {
+  flex: 1; font-size: 1.2em; font-weight: 500;
+}
+.album-detail-header .btn-edit-name,
+.album-detail-header .btn-delete-album {
+  background: rgba(255,255,255,0.08); border: none;
+  color: var(--text-secondary); padding: 8px 14px;
+  border-radius: 8px; cursor: pointer; font-size: 0.85em;
+  transition: all 0.2s;
+}
+.album-detail-header .btn-edit-name:hover { background: rgba(255,255,255,0.15); color: #fff; }
+.album-detail-header .btn-delete-album:hover { background: rgba(255,107,107,0.3); color: var(--danger); }
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px; margin-bottom: 24px;
+}
+.image-grid .img-item {
+  aspect-ratio: 1; border-radius: var(--radius-sm);
+  overflow: hidden; position: relative; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.image-grid .img-item img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.3s;
+}
+.image-grid .img-item:hover img { transform: scale(1.05); }
+.image-grid .img-item .img-delete {
+  position: absolute; top: 6px; right: 6px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(0,0,0,0.5); border: none;
+  color: #fff; cursor: pointer; font-size: 14px;
+  display: none; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.image-grid .img-item:hover .img-delete { display: flex; }
+.image-grid .img-item .img-delete:hover { background: rgba(255,107,107,0.8); }
+
+.upload-zone {
+  padding: 40px; border: 2px dashed rgba(255,255,255,0.2);
+  border-radius: var(--radius); text-align: center;
+  cursor: pointer; transition: all 0.3s;
+  background: rgba(255,255,255,0.03);
+}
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--accent-pink);
+  background: rgba(255,255,255,0.08);
+}
+.upload-zone .upload-icon { font-size: 2.5em; margin-bottom: 8px; opacity: 0.6; }
+.upload-zone .upload-text { color: var(--text-secondary); font-size: 0.9em; }
+
+/* ========== Lightbox ========== */
+.lightbox {
+  display: none; position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%; z-index: 2000;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.lightbox.active { display: flex; }
+.lightbox img {
+  max-width: 90%; max-height: 90%;
+  border-radius: 8px;
+  box-shadow: 0 0 60px rgba(0,0,0,0.5);
+}
+
+/* ========== Storyline Editor ========== */
+.editor-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 20px; padding: 16px 20px;
+}
+.editor-header .btn-back {
+  background: rgba(255,255,255,0.1); border: none;
+  color: #fff; padding: 8px 14px; border-radius: 8px;
+  cursor: pointer; font-size: 0.9em; transition: all 0.2s;
+}
+.editor-header .btn-back:hover { background: rgba(255,255,255,0.2); }
+.editor-header .editor-title { flex: 1; font-size: 1.2em; font-weight: 500; }
+.editor-header .story-badge {
+  font-size: 0.75em; padding: 4px 12px;
+  border-radius: 12px; letter-spacing: 1px;
+}
+.editor-header .story-badge.main {
+  background: rgba(255,215,0,0.2); color: var(--accent-gold);
+  border: 1px solid rgba(255,215,0,0.3);
+}
+.editor-header .story-badge.if {
+  background: rgba(192,200,224,0.15); color: var(--accent-silver);
+  border: 1px solid rgba(192,200,224,0.25);
+}
+.editor-header .btn-edit-name {
+  background: rgba(255,255,255,0.08); border: none;
+  color: var(--text-secondary); padding: 8px 14px;
+  border-radius: 8px; cursor: pointer; font-size: 0.85em;
+  transition: all 0.2s;
+}
+.editor-header .btn-edit-name:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* Chapter Tabs */
+.chapter-tabs {
+  display: flex; gap: 8px; margin-bottom: 16px;
+  overflow-x: auto; padding: 8px 0;
+  scrollbar-width: thin;
+}
+.chapter-tabs::-webkit-scrollbar { height: 4px; }
+.chapter-tabs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+.chapter-tab {
+  padding: 10px 18px; border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text-secondary); cursor: pointer;
+  font-size: 0.85em; white-space: nowrap;
+  transition: all 0.3s; position: relative;
+}
+.chapter-tab:hover { background: rgba(255,255,255,0.12); }
+.chapter-tab.active {
+  background: rgba(247,168,196,0.2);
+  border-color: var(--accent-pink);
+  color: #fff;
+}
+.chapter-tab .tab-delete {
+  position: absolute; top: -4px; right: -4px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: rgba(255,100,100,0.6);
+  border: none; color: #fff; cursor: pointer;
+  font-size: 10px; line-height: 1;
+  display: none; align-items: center; justify-content: center;
+}
+.chapter-tab:hover .tab-delete { display: flex; }
+
+.btn-add-chapter {
+  padding: 10px 18px; border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px dashed rgba(255,255,255,0.25);
+  color: var(--text-secondary); cursor: pointer;
+  font-size: 0.85em; white-space: nowrap;
+  transition: all 0.3s;
+}
+.btn-add-chapter:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff; border-color: rgba(255,255,255,0.4);
+}
+
+.editor-layout {
+  display: flex; gap: 20px; min-height: 60vh;
+}
+.editor-main {
+  flex: 1; display: flex; flex-direction: column;
+}
+.editor-toolbar {
+  display: flex; gap: 6px; padding: 10px 14px;
+  margin-bottom: 12px; flex-wrap: wrap;
+}
+.editor-toolbar button {
+  background: rgba(255,255,255,0.08); border: none;
+  color: var(--text-secondary); padding: 6px 12px;
+  border-radius: 6px; cursor: pointer; font-size: 0.85em;
+  transition: all 0.2s;
+}
+.editor-toolbar button:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+.editor-content {
+  flex: 1; padding: 20px; min-height: 400px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  outline: none; font-size: 0.95em; line-height: 1.8;
+  color: var(--text-primary);
+}
+.editor-content:empty::before {
+  content: '在这里书写你的故事...';
+  color: rgba(255,255,255,0.3);
+}
+.editor-content:focus { border-color: var(--accent-pink); }
+
+.editor-sidebar {
+  width: 280px; flex-shrink: 0;
+}
+.sidebar-section {
+  padding: 16px; margin-bottom: 16px;
+}
+.sidebar-section h4 {
+  font-size: 0.85em; color: var(--text-secondary);
+  letter-spacing: 1px; margin-bottom: 12px;
+  font-weight: 400;
+}
+.album-link-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  margin-bottom: 6px; transition: all 0.2s;
+}
+.album-link-item:hover { background: rgba(255,255,255,0.08); }
+.album-link-item input[type="checkbox"] {
+  accent-color: var(--accent-pink);
+  width: 16px; height: 16px;
+}
+.album-link-item .link-name {
+  font-size: 0.88em; cursor: pointer; flex: 1;
+}
+.album-link-item .link-count {
+  font-size: 0.72em; color: var(--text-secondary);
+}
+.sidebar-section .linked-preview {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 6px; margin-top: 12px;
+}
+.sidebar-section .linked-preview img {
+  width: 100%; aspect-ratio: 1; object-fit: cover;
+  border-radius: 6px; cursor: pointer;
+  transition: transform 0.2s;
+}
+.sidebar-section .linked-preview img:hover { transform: scale(1.05); }
+
+.btn-save-story {
+  display: block; margin-top: 16px; width: 100%;
+  padding: 12px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+  border: none; color: #fff; font-size: 0.95em;
+  cursor: pointer; transition: all 0.3s;
+}
+.btn-save-story:hover { opacity: 0.85; }
+
+/* ========== Timeline View ========== */
+.timeline-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 30px; padding: 16px 20px;
+}
+.timeline-header .timeline-title {
+  flex: 1; font-size: 1.3em; font-weight: 400;
+}
+
+.timeline-container {
+  padding: 40px 20px; min-height: 60vh;
+  position: relative;
+}
+
+/* Main Timeline Axis */
+.timeline-main-axis {
+  display: flex; align-items: center; gap: 40px;
+  padding: 20px 0; margin-bottom: 60px;
+  position: relative;
+  overflow-x: auto;
+}
+.timeline-main-axis::before {
+  content: '';
+  position: absolute; top: 50%; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--accent-gold) 10%,
+    var(--accent-gold) 90%,
+    transparent
+  );
+  z-index: 0;
+}
+
+.timeline-axis-label {
+  position: absolute; top: -40px; left: 20px;
+  font-size: 1.1em; color: var(--accent-gold);
+  font-weight: 500; letter-spacing: 2px;
+}
+
+/* Timeline Nodes */
+.timeline-node {
+  position: relative; z-index: 1;
+  cursor: pointer; transition: all 0.3s;
+}
+.timeline-node .node-card {
+  width: 140px; padding: 16px 12px;
+  background: rgba(255,215,0,0.1);
+  border: 2px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  transition: all 0.3s;
+}
+.timeline-node .node-card:hover {
+  transform: scale(1.08);
+  background: rgba(255,215,0,0.2);
+  box-shadow: 0 8px 24px rgba(255,215,0,0.3);
+}
+.timeline-node.main-node .node-card {
+  background: rgba(255,215,0,0.12);
+}
+.timeline-node.if-node .node-card {
+  background: rgba(192,200,224,0.12);
+  border-color: var(--accent-silver);
+}
+.timeline-node.if-node .node-card:hover {
+  background: rgba(192,200,224,0.22);
+  box-shadow: 0 8px 24px rgba(192,200,224,0.3);
+}
+
+.timeline-node .node-title {
+  font-size: 0.9em; font-weight: 500;
+  margin-bottom: 4px;
+}
+.timeline-node .node-chapter {
+  font-size: 0.7em; opacity: 0.8;
+}
+.timeline-node.main-node .node-title { color: var(--accent-gold); }
+.timeline-node.if-node .node-title { color: var(--accent-silver); }
+
+/* Connection Lines */
+.timeline-branch {
+  position: absolute; top: 50%;
+  width: 2px;
+  background: var(--accent-silver);
+  opacity: 0.6;
+}
+.timeline-branch::after {
+  content: '';
+  position: absolute; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--accent-silver);
+}
+.timeline-branch.branch-top { bottom: 100%; }
+.timeline-branch.branch-top::after { bottom: -5px; left: 50%; transform: translateX(-50%); }
+.timeline-branch.branch-bottom { top: 100%; }
+.timeline-branch.branch-bottom::after { top: -5px; left: 50%; transform: translateX(-50%); }
+
+/* IF Nodes Container */
+.timeline-if-nodes {
+  position: absolute; width: 100%;
+  pointer-events: none;
+}
+.timeline-if-nodes .if-node {
+  position: absolute; pointer-events: auto;
+}
+.timeline-if-nodes .if-node .branch-connector {
+  position: absolute; width: 2px;
+  background: var(--accent-silver); opacity: 0.5;
+}
+
+/* Empty Timeline State */
+.timeline-empty {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-secondary); font-size: 0.9em;
+}
+.timeline-empty .empty-icon { font-size: 3em; margin-bottom: 16px; opacity: 0.5; }
+
+/* ========== Empty State ========== */
+.empty-state {
+  text-align: center; padding: 40px 20px;
+  color: var(--text-secondary); font-size: 0.9em;
+}
+.empty-state .empty-icon { font-size: 2em; margin-bottom: 10px; opacity: 0.5; }
+
+/* ========== Toast ========== */
+.toast {
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  padding: 12px 28px; border-radius: 20px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; font-size: 0.9em;
+  z-index: 3000; opacity: 0;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .app-header h1 { font-size: 1.8em; letter-spacing: 3px; }
+  .editor-layout { flex-direction: column; }
+  .editor-sidebar { width: 100%; }
+  .album-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .image-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .storyline-grid { grid-template-columns: 1fr; }
+  .action-cards { flex-direction: column; }
+  .timeline-main-axis { gap: 20px; }
+  .timeline-node .node-card { width: 100px; padding: 12px 8px; }
+}
+@media (max-width: 480px) {
+  .app-container { padding: 12px 14px 40px; }
+  .app-header { padding: 24px 0 20px; }
+  .app-header h1 { font-size: 1.5em; }
+  .timeline-node .node-card { width: 80px; padding: 10px 6px; }
+  .timeline-node .node-title { font-size: 0.75em; }
+  .timeline-node .node-chapter { font-size: 0.6em; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background Orbs -->
+<div class="bg-orbs">
+  <div class="orb"></div><div class="orb"></div><div class="orb"></div>
+  <div class="orb"></div><div class="orb"></div>
+</div>
+<!-- ==================== MAIN VIEW ==================== -->
+<div class="app-container">
+  <div id="mainView" class="view active">
+    <header class="app-header">
+      <h1>梦境手札</h1>
+      <div class="subtitle">~ Dream Journal ~</div>
+    </header>
+
+    <!-- Category Bar -->
+    <div id="categoryBar" class="category-bar glass"></div>
+
+    <!-- Action Cards -->
+    <div class="action-cards">
+      <div class="action-card glass" onclick="createAlbum()">
+        <div class="icon">&#128247;</div>
+        <div class="label">新建相册</div>
+      </div>
+      <div class="action-card glass" onclick="showStorylineModal()">
+        <div class="icon">&#128214;</div>
+        <div class="label">新建故事线</div>
+      </div>
+    </div>
+
+    <!-- Albums Section -->
+    <div class="section-title">&#128247; 我的相册</div>
+    <div id="albumGrid" class="album-grid"></div>
+    <div id="albumEmpty" class="empty-state" style="display:none;">
+      <div class="empty-icon">&#128247;</div>
+      <div>还没有相册，点击上方「新建相册」开始吧</div>
+    </div>
+
+    <!-- Storylines Section -->
+    <div class="section-title">&#128214; 我的故事线</div>
+    <div id="storylineGrid" class="storyline-grid"></div>
+    <div id="storylineEmpty" class="empty-state" style="display:none;">
+      <div class="empty-icon">&#128214;</div>
+      <div>还没有故事线，点击上方「新建故事线」开始创作</div>
+    </div>
+  </div>
+
+  <!-- ==================== ALBUM DETAIL VIEW ==================== -->
+  <div id="albumView" class="view">
+    <div class="album-detail-header glass">
+      <button class="btn-back" onclick="goBack()">&#8592; 返回</button>
+      <span id="albumDetailTitle" class="album-title"></span>
+      <button class="btn-edit-name" onclick="renameAlbumDetail()">&#9998; 改名</button>
+      <button class="btn-delete-album" onclick="deleteCurrentAlbum()">&#128465; 删除</button>
+    </div>
+    <div id="imageGrid" class="image-grid"></div>
+    <div class="upload-zone glass-sm" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-icon">&#128228;</div>
+      <div class="upload-text">拖拽或点击上传图片</div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" multiple style="display:none;" onchange="handleFiles(this.files)">
+  </div>
+
+  <!-- ==================== STORYLINE EDITOR VIEW ==================== -->
+  <div id="editorView" class="view">
+    <div class="editor-header glass">
+      <button class="btn-back" onclick="goBack()">&#8592; 返回</button>
+      <span id="editorTitle" class="editor-title"></span>
+      <span id="editorBadge" class="story-badge"></span>
+      <button class="btn-edit-name" onclick="renameStoryline()">&#9998; 改名</button>
+    </div>
+
+    <!-- Chapter Tabs -->
+    <div class="chapter-tabs">
+      <div id="chapterTabsList" style="display:flex;gap:8px;flex:1;overflow-x:auto;"></div>
+      <button class="btn-add-chapter" onclick="addChapter()">+ 新建章节</button>
+    </div>
+
+    <div class="editor-layout">
+      <div class="editor-main">
+        <div class="editor-toolbar glass-sm">
+          <button onclick="execCmd('bold')"><b>B</b></button>
+          <button onclick="execCmd('italic')"><i>I</i></button>
+          <button onclick="execCmd('underline')"><u>U</u></button>
+          <button onclick="execCmd('insertUnorderedList')">&#8226; 列表</button>
+          <button onclick="execCmd('formatBlock','<h2>')">标题</button>
+          <button onclick="execCmd('formatBlock','<blockquote>')">引用</button>
+          <button onclick="execCmd('removeFormat')">清除</button>
+        </div>
+        <div id="editorContent" class="editor-content" contenteditable="true"></div>
+      </div>
+      <div class="editor-sidebar">
+        <div class="sidebar-section glass-sm">
+          <h4>&#128279; 关联相册</h4>
+          <div id="albumLinkList"></div>
+        </div>
+        <div class="sidebar-section glass-sm" id="linkedPreviewSection" style="display:none;">
+          <h4>&#128444; 已关联图片</h4>
+          <div id="linkedPreview" class="linked-preview"></div>
+        </div>
+        <button class="btn-save-story" onclick="saveStoryContent()">&#128190; 保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TIMELINE VIEW ==================== -->
+  <div id="timelineView" class="view">
+    <div class="timeline-header glass">
+      <button class="btn-back" onclick="goBack()">&#8592; 返回</button>
+      <span id="timelineTitle" class="timeline-title"></span>
+      <span id="timelineBadge" class="story-badge"></span>
+    </div>
+    <div class="timeline-container glass-sm">
+      <div id="timelineContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Storyline Type Modal -->
+<div id="storylineModal" class="modal-overlay">
+  <div class="modal glass">
+    <h3>&#10024; 新建故事线 &#10024;</h3>
+    <div class="modal-options">
+      <div class="modal-option" onclick="createStoryline('main')">
+        <div class="opt-icon">&#11088;</div>
+        <div>
+          <div class="opt-label" style="color:var(--accent-gold);">新建主线</div>
+          <div class="opt-desc">主要剧情发展线路</div>
+        </div>
+      </div>
+      <div class="modal-option" onclick="createStoryline('if')">
+        <div class="opt-icon">&#10022;</div>
+        <div>
+          <div class="opt-label" style="color:var(--accent-silver);">新建IF线</div>
+          <div class="opt-desc">平行世界 / 番外支线</div>
+        </div>
+      </div>
+    </div>
+    <button class="modal-cancel" onclick="closeModal('storylineModal')">取消</button>
+  </div>
+</div>
+
+<!-- IF Line Link Modal -->
+<div id="ifLinkModal" class="modal-overlay">
+  <div class="modal glass">
+    <h3>&#10022; IF线关联设置 &#10022;</h3>
+    <p style="text-align:center;color:var(--text-secondary);margin-bottom:20px;font-size:0.9em;">
+      是否将此IF线与主线关联？
+    </p>
+    <div class="modal-options">
+      <div class="modal-option" onclick="confirmIfLine(true)">
+        <div class="opt-icon">&#128279;</div>
+        <div>
+          <div class="opt-label" style="color:var(--accent-pink);">是，关联主线</div>
+          <div class="opt-desc">从主线某个节点分叉出来的平行世界</div>
+        </div>
+      </div>
+      <div class="modal-option" onclick="confirmIfLine(false)">
+        <div class="opt-icon">&#127757;</div>
+        <div>
+          <div class="opt-label" style="color:var(--accent-purple);">否，独立世界观</div>
+          <div class="opt-desc">完全独立的新世界设定</div>
+        </div>
+      </div>
+    </div>
+    <button class="modal-cancel" onclick="closeModal('ifLinkModal')">取消</button>
+  </div>
+</div>
+
+<!-- Input Modal -->
+<div id="inputModal" class="modal-overlay">
+  <div class="modal glass input-modal">
+    <h3 id="inputModalTitle">输入</h3>
+    <div id="inputModalContent">
+      <input type="text" id="inputModalField" placeholder="" autocomplete="off">
+    </div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeModal('inputModal')">取消</button>
+      <button class="btn-confirm" id="inputModalConfirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirmModal" class="modal-overlay">
+  <div class="modal glass confirm-modal">
+    <h3 id="confirmModalTitle">确认</h3>
+    <p id="confirmModalText"></p>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeModal('confirmModal')">取消</button>
+      <button class="btn-danger" id="confirmModalConfirm">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+<script>
+// ==================== Data Layer ====================
+const STORAGE_KEY = 'dreamJournalData';
+
+function getDefaultData() {
+  return {
+    categories: [],
+    activeCategory: null,
+    albums: [],
+    storylines: [],
+    nextId: 1
+  };
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return getDefaultData();
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+}
+
+let appData = loadData();
+
+function genId() {
+  const id = appData.nextId++;
+  saveData();
+  return id;
+}
+
+// ==================== Toast ====================
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ==================== Modal Helpers ====================
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function showInputModal(title, placeholder, defaultVal, callback, options = {}) {
+  document.getElementById('inputModalTitle').textContent = title;
+  const content = document.getElementById('inputModalContent');
+
+  if (options.select) {
+    content.innerHTML = `<select id="inputModalSelect">${options.select.map(opt =>
+      `<option value="${opt.value}">${opt.label}</option>`
+    ).join('')}</select>`;
+  } else {
+    content.innerHTML = `<input type="text" id="inputModalField" placeholder="" autocomplete="off">`;
+    const field = document.getElementById('inputModalField');
+    field.placeholder = placeholder || '';
+    field.value = defaultVal || '';
+  }
+
+  document.getElementById('inputModalConfirm').onclick = () => {
+    let val;
+    if (options.select) {
+      val = document.getElementById('inputModalSelect').value;
+    } else {
+      val = document.getElementById('inputModalField').value.trim();
+    }
+    if (val) { closeModal('inputModal'); callback(val); }
+  };
+  openModal('inputModal');
+  setTimeout(() => {
+    const input = content.querySelector('input, select');
+    if (input) input.focus();
+  }, 100);
+}
+
+function showConfirm(title, text, callback) {
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalText').textContent = text;
+  document.getElementById('confirmModalConfirm').onclick = () => {
+    closeModal('confirmModal');
+    callback();
+  };
+  openModal('confirmModal');
+}
+
+// ==================== Close modals on overlay click ====================
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+    }
+  });
+});
+
+// ==================== Categories ====================
+let currentCategory = appData.activeCategory;
+
+function renderCategories() {
+  const bar = document.getElementById('categoryBar');
+  let html = '';
+  appData.categories.forEach(cat => {
+    const active = cat.id === currentCategory ? ' active' : '';
+    html += `<div class="category-tag${active}" data-id="${cat.id}">
+      <span class="tag-name" ondblclick="renameCategory(${cat.id})">${escHtml(cat.name)}</span>
+      <button class="tag-delete" onclick="event.stopPropagation();deleteCategory(${cat.id})" title="删除分类">&times;</button>
+    </div>`;
+  });
+  html += `<button class="btn-add-category" onclick="addCategory()">+ 新建分类</button>`;
+  bar.innerHTML = html;
+
+  // Click handlers
+  bar.querySelectorAll('.category-tag').forEach(tag => {
+    tag.addEventListener('click', (e) => {
+      if (e.target.classList.contains('tag-delete') || e.target.classList.contains('tag-name')) return;
+      const id = parseInt(tag.dataset.id);
+      currentCategory = id;
+      appData.activeCategory = id;
+      saveData();
+      renderCategories();
+      renderAlbums();
+      renderStorylines();
+    });
+  });
+}
+
+function addCategory() {
+  showInputModal('新建分类', '输入分类名称...', '', (name) => {
+    appData.categories.push({ id: genId(), name });
+    saveData();
+    renderCategories();
+    showToast('分类已创建');
+  });
+}
+
+function renameCategory(id) {
+  const cat = appData.categories.find(c => c.id === id);
+  if (!cat) return;
+  showInputModal('修改分类名称', '输入新名称...', cat.name, (name) => {
+    cat.name = name;
+    saveData();
+    renderCategories();
+    showToast('分类已改名');
+  });
+}
+
+function deleteCategory(id) {
+  const cat = appData.categories.find(c => c.id === id);
+  if (!cat) return;
+  showConfirm('删除分类', `确定要删除分类「${cat.name}」吗？该分类下的相册和故事线不会被删除。`, () => {
+    appData.categories = appData.categories.filter(c => c.id !== id);
+    if (currentCategory === id) {
+      currentCategory = appData.categories.length > 0 ? appData.categories[0].id : null;
+      appData.activeCategory = currentCategory;
+    }
+    saveData();
+    renderCategories();
+    renderAlbums();
+    renderStorylines();
+    showToast('分类已删除');
+  });
+}
+
+// ==================== Albums ====================
+let currentAlbumId = null;
+
+function getFilteredAlbums() {
+  if (!currentCategory) return appData.albums;
+  return appData.albums.filter(a => a.categoryId === currentCategory);
+}
+
+function renderAlbums() {
+  const albums = getFilteredAlbums();
+  const grid = document.getElementById('albumGrid');
+  const empty = document.getElementById('albumEmpty');
+
+  if (albums.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = albums.map(album => {
+    const coverImg = album.images && album.images.length > 0
+      ? `<img src="${album.images[0].data}" alt="">`
+      : '<div style="font-size:2.5em;opacity:0.4;">&#128247;</div>';
+    const count = album.images ? album.images.length : 0;
+    return `<div class="album-card glass-sm" onclick="openAlbum(${album.id})">
+      <div class="album-cover">${coverImg}</div>
+      <div class="album-info">
+        <span class="album-name">${escHtml(album.name)}</span>
+        <span class="album-count">${count}张</span>
+      </div>
+      <div class="album-actions" onclick="event.stopPropagation();">
+        <button title="改名" onclick="renameAlbum(${album.id})">&#9998;</button>
+        <button class="btn-del" title="删除" onclick="deleteAlbum(${album.id})">&#128465;</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function createAlbum() {
+  showInputModal('新建相册', '输入相册名称...', '', (name) => {
+    appData.albums.push({
+      id: genId(),
+      name,
+      categoryId: currentCategory,
+      images: [],
+      createdAt: Date.now()
+    });
+    saveData();
+    renderAlbums();
+    showToast('相册已创建');
+  });
+}
+
+function renameAlbum(id) {
+  const album = appData.albums.find(a => a.id === id);
+  if (!album) return;
+  showInputModal('修改相册名称', '输入新名称...', album.name, (name) => {
+    album.name = name;
+    saveData();
+    renderAlbums();
+    updateAlbumDetailTitle();
+    showToast('相册已改名');
+  });
+}
+
+function renameAlbumDetail() {
+  if (currentAlbumId) renameAlbum(currentAlbumId);
+}
+
+function deleteAlbum(id) {
+  const album = appData.albums.find(a => a.id === id);
+  if (!album) return;
+  showConfirm('删除相册', `确定要删除相册「${album.name}」及其所有图片吗？`, () => {
+    appData.albums = appData.albums.filter(a => a.id !== id);
+    // Remove from storyline links
+    appData.storylines.forEach(s => {
+      if (s.linkedAlbums) s.linkedAlbums = s.linkedAlbums.filter(a => a !== id);
+    });
+    saveData();
+    renderAlbums();
+    showToast('相册已删除');
+  });
+}
+
+function deleteCurrentAlbum() {
+  if (currentAlbumId) {
+    deleteAlbum(currentAlbumId);
+    goBack();
+  }
+}
+
+function openAlbum(id) {
+  currentAlbumId = id;
+  const album = appData.albums.find(a => a.id === id);
+  if (!album) return;
+  updateAlbumDetailTitle();
+  renderAlbumImages();
+  switchView('albumView');
+}
+
+function updateAlbumDetailTitle() {
+  const album = appData.albums.find(a => a.id === currentAlbumId);
+  if (album) {
+    document.getElementById('albumDetailTitle').textContent = album.name;
+  }
+}
+
+function renderAlbumImages() {
+  const album = appData.albums.find(a => a.id === currentAlbumId);
+  if (!album) return;
+  const grid = document.getElementById('imageGrid');
+  if (!album.images || album.images.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128444;</div><div>还没有图片，点击下方上传</div></div>';
+    return;
+  }
+  grid.innerHTML = album.images.map((img, idx) => `
+    <div class="img-item glass-sm">
+      <img src="${img.data}" alt="${escHtml(img.name)}" onclick="openLightbox('${img.data.replace(/'/g, "\\'")}')">
+      <button class="img-delete" onclick="event.stopPropagation();deleteImage(${idx})">&times;</button>
+    </div>
+  `).join('');
+}
+
+function deleteImage(idx) {
+  const album = appData.albums.find(a => a.id === currentAlbumId);
+  if (!album || !album.images) return;
+  album.images.splice(idx, 1);
+  saveData();
+  renderAlbumImages();
+  showToast('图片已删除');
+}
+
+// File upload
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => { uploadZone.classList.remove('dragover'); });
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+});
+
+function handleFiles(files) {
+  const album = appData.albums.find(a => a.id === currentAlbumId);
+  if (!album) return;
+  if (!album.images) album.images = [];
+
+  Array.from(files).forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      album.images.push({
+        name: file.name,
+        data: e.target.result,
+        addedAt: Date.now()
+      });
+      saveData();
+      renderAlbumImages();
+    };
+    reader.readAsDataURL(file);
+  });
+  showToast('正在上传...');
+}
+
+// Lightbox
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+}
+
+// ==================== Storylines ====================
+let currentStorylineId = null;
+let currentChapterId = null;
+
+function getFilteredStorylines() {
+  if (!currentCategory) return appData.storylines;
+  return appData.storylines.filter(s => s.categoryId === currentCategory);
+}
+
+function renderStorylines() {
+  const stories = getFilteredStorylines();
+  const grid = document.getElementById('storylineGrid');
+  const empty = document.getElementById('storylineEmpty');
+
+  if (stories.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = stories.map(s => {
+    const typeClass = s.type === 'main' ? 'main-story' : 'if-story';
+    let typeLabel = s.type === 'main' ? '&#11088; 主线' : '&#10022; IF线';
+    const linkedNames = (s.linkedAlbums || []).map(aId => {
+      const a = appData.albums.find(al => al.id === aId);
+      return a ? a.name : '(已删除)';
+    }).join(', ');
+    const timeStr = s.updatedAt ? timeAgo(s.updatedAt) : '刚刚创建';
+    const chapterCount = s.chapters ? s.chapters.length : 0;
+
+    // Handle different IF line types
+    let subtypeInfo = '';
+    if (s.type === 'if') {
+      if (s.isIndependent) {
+        typeLabel = '&#10022; IF线';
+        subtypeInfo = '<span style="color:var(--accent-purple);">&#127757; 独立世界观</span>';
+      } else {
+        typeLabel = '&#10022; IF线';
+        const parentId = s.parentId ? appData.storylines.find(x => x.id === s.parentId) : null;
+        if (parentId) {
+          subtypeInfo = `<span style="color:var(--accent-silver);">&#128279; 从「${escHtml(parentId.name)}」分叉</span>`;
+        }
+      }
+    }
+
+    return `<div class="storyline-card glass-sm ${typeClass}">
+      <div class="story-actions" onclick="event.stopPropagation();">
+        <button title="改名" onclick="renameStorylineById(${s.id})">&#9998;</button>
+        <button class="btn-del" title="删除" onclick="deleteStoryline(${s.id})">&#128465;</button>
+      </div>
+      <div class="story-type">${typeLabel}</div>
+      <div class="story-name" onclick="openStoryline(${s.id})">${escHtml(s.name)}</div>
+      <div class="story-meta">
+        <span>${chapterCount}章 · ${linkedNames ? '关联: ' + escHtml(linkedNames) : '未关联相册'}</span>
+        ${subtypeInfo}
+        <span>${timeStr}</span>
+      </div>
+      <div class="btn-timeline" onclick="event.stopPropagation();openTimeline(${s.id})">&#128200; 时间轴</div>
+    </div>`;
+  }).join('');
+}
+
+function showStorylineModal() {
+  openModal('storylineModal');
+}
+
+function createStoryline(type) {
+  closeModal('storylineModal');
+  const label = type === 'main' ? '主线' : 'IF线';
+
+  if (type === 'if') {
+    // Open IF link selection modal first
+    openModal('ifLinkModal');
+    // Store the type for later use
+    window.pendingStorylineType = 'if';
+    return;
+  }
+
+  // For main storylines, proceed directly
+  showInputModal(`新建${label}`, `输入${label}名称...`, '', (name) => {
+    const story = {
+      id: genId(),
+      name,
+      type: 'main',
+      categoryId: currentCategory,
+      linkedAlbums: [],
+      chapters: [],
+      isIndependent: false,
+      parentId: null,
+      parentChapterId: null,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    finalizeStorylineCreation(story, '主线');
+  });
+}
+
+function confirmIfLine(shouldLink) {
+  closeModal('ifLinkModal');
+  window.pendingIfShouldLink = shouldLink;
+
+  showInputModal('新建IF线', '输入IF线名称...', '', (name) => {
+    const story = {
+      id: genId(),
+      name,
+      type: 'if',
+      categoryId: currentCategory,
+      linkedAlbums: [],
+      chapters: [],
+      isIndependent: !shouldLink,
+      parentId: null,
+      parentChapterId: null,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+
+    if (shouldLink) {
+      const mainStories = appData.storylines.filter(s => s.type === 'main' && s.categoryId === currentCategory);
+      if (mainStories.length > 0) {
+        showInputModal(
+          '选择主线',
+          '选择要基于哪条主线创建IF线',
+          '',
+          (parentName) => {
+            const parent = mainStories.find(s => s.name === parentName);
+            if (parent) {
+              story.parentId = parent.id;
+              story.parentChapterId = parent.chapters && parent.chapters.length > 0 ? parent.chapters[0].id : null;
+            }
+            finalizeStorylineCreation(story, 'IF线');
+          },
+          {
+            select: mainStories.map(s => ({ value: s.name, label: s.name }))
+          }
+        );
+        return;
+      } else {
+        showToast('当前分类下没有主线，已创建为独立IF线');
+        story.isIndependent = true;
+      }
+    }
+
+    finalizeStorylineCreation(story, 'IF线');
+  });
+}
+
+function finalizeStorylineCreation(story, label) {
+  appData.storylines.push(story);
+  saveData();
+  renderStorylines();
+  showToast(`${label}已创建`);
+}
+
+function renameStorylineById(id) {
+  const s = appData.storylines.find(x => x.id === id);
+  if (!s) return;
+  showInputModal('修改故事线名称', '输入新名称...', s.name, (name) => {
+    s.name = name;
+    s.updatedAt = Date.now();
+    saveData();
+    renderStorylines();
+    updateEditorTitle();
+    showToast('故事线已改名');
+  });
+}
+
+function renameStoryline() {
+  if (currentStorylineId) renameStorylineById(currentStorylineId);
+}
+
+function deleteStoryline(id) {
+  const s = appData.storylines.find(x => x.id === id);
+  if (!s) return;
+  showConfirm('删除故事线', `确定要删除故事线「${s.name}」吗？`, () => {
+    appData.storylines = appData.storylines.filter(x => x.id !== id);
+    // Remove parent references
+    appData.storylines.forEach(story => {
+      if (story.parentId === id) {
+        story.parentId = null;
+        story.parentChapterId = null;
+      }
+    });
+    saveData();
+    renderStorylines();
+    showToast('故事线已删除');
+  });
+}
+
+function openStoryline(id) {
+  currentStorylineId = id;
+  const s = appData.storylines.find(x => x.id === id);
+  if (!s) return;
+
+  // Initialize with default chapter if none exist
+  if (!s.chapters || s.chapters.length === 0) {
+    s.chapters = [{ id: genId(), title: '第一章', content: '' }];
+    saveData();
+  }
+
+  // Set current chapter to first chapter
+  currentChapterId = s.chapters[0].id;
+
+  updateEditorTitle();
+  renderChapterTabs();
+  renderCurrentChapter();
+  renderAlbumLinks();
+  switchView('editorView');
+}
+
+function updateEditorTitle() {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+  document.getElementById('editorTitle').textContent = s.name;
+  const badge = document.getElementById('editorBadge');
+  if (s.type === 'main') {
+    badge.textContent = '★ 主线';
+    badge.className = 'story-badge main';
+  } else {
+    badge.textContent = '☆ IF线';
+    badge.className = 'story-badge if';
+  }
+}
+
+// ==================== Chapters ====================
+function renderChapterTabs() {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s || !s.chapters) return;
+
+  const container = document.getElementById('chapterTabsList');
+  container.innerHTML = s.chapters.map((ch, idx) => {
+    const active = ch.id === currentChapterId ? ' active' : '';
+    return `<div class="chapter-tab${active}" onclick="switchChapter(${ch.id})">
+      ${escHtml(ch.title)}
+      <button class="tab-delete" onclick="event.stopPropagation();deleteChapter(${ch.id})">&times;</button>
+    </div>`;
+  }).join('');
+}
+
+function addChapter() {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+
+  const chapterNum = s.chapters.length + 1;
+  const titles = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+  const defaultTitle = `第${titles[chapterNum - 1] || chapterNum}章`;
+
+  showInputModal('新建章节', '输入章节标题...', defaultTitle, (title) => {
+    s.chapters.push({ id: genId(), title, content: '' });
+    s.updatedAt = Date.now();
+    saveData();
+    currentChapterId = s.chapters[s.chapters.length - 1].id;
+    renderChapterTabs();
+    renderCurrentChapter();
+    showToast('章节已创建');
+  });
+}
+
+function switchChapter(chapterId) {
+  currentChapterId = chapterId;
+  // Save current content first
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (s) {
+    const ch = s.chapters.find(c => c.id === currentChapterId);
+    if (ch) {
+      ch.content = document.getElementById('editorContent').innerHTML;
+    }
+  }
+  renderChapterTabs();
+  renderCurrentChapter();
+}
+
+function renderCurrentChapter() {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+  const ch = s.chapters.find(c => c.id === currentChapterId);
+  if (!ch) return;
+  document.getElementById('editorContent').innerHTML = ch.content || '';
+}
+
+function deleteChapter(chapterId) {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s || s.chapters.length <= 1) {
+    showToast('至少保留一个章节');
+    return;
+  }
+
+  showConfirm('删除章节', '确定要删除这个章节吗？', () => {
+    s.chapters = s.chapters.filter(c => c.id !== chapterId);
+    s.updatedAt = Date.now();
+    saveData();
+    if (currentChapterId === chapterId) {
+      currentChapterId = s.chapters[0].id;
+    }
+    renderChapterTabs();
+    renderCurrentChapter();
+    showToast('章节已删除');
+  });
+}
+
+// ==================== Timeline ====================
+function openTimeline(id) {
+  currentStorylineId = id;
+  const s = appData.storylines.find(x => x.id === id);
+  if (!s) return;
+
+  updateTimelineTitle();
+  renderTimeline();
+  switchView('timelineView');
+}
+
+function updateTimelineTitle() {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+  document.getElementById('timelineTitle').textContent = s.name + ' - 时间轴';
+  const badge = document.getElementById('timelineBadge');
+  if (s.type === 'main') {
+    badge.textContent = '★ 主线';
+    badge.className = 'story-badge main';
+  } else {
+    badge.textContent = '☆ IF线';
+    badge.className = 'story-badge if';
+  }
+}
+
+function renderTimeline() {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+
+  const container = document.getElementById('timelineContent');
+
+  if (!s.chapters || s.chapters.length === 0) {
+    container.innerHTML = '<div class="timeline-empty"><div class="empty-icon">&#128200;</div><div>还没有章节，去编辑器创建章节吧</div></div>';
+    return;
+  }
+
+  let html = '';
+
+  // Different display based on storyline type
+  if (s.type === 'main') {
+    // Main storyline: show main axis + IF branches
+    html += '<div class="timeline-main-axis"><div class="timeline-axis-label">★ 主线轴</div>';
+
+    // Main chapters
+    html += s.chapters.map((ch, idx) => `
+      <div class="timeline-node main-node" onclick="openChapterFromTimeline(${ch.id})">
+        <div class="node-card">
+          <div class="node-title">${escHtml(ch.title)}</div>
+          <div class="node-chapter">Ch.${idx + 1}</div>
+        </div>
+      </div>
+    `).join('');
+
+    html += '</div>';
+
+    // IF branches (only show linked IF lines, not independent ones)
+    const ifStories = appData.storylines.filter(st =>
+      st.parentId === currentStorylineId && st.type === 'if' && !st.isIndependent
+    );
+
+    if (ifStories.length > 0) {
+      html += '<div class="timeline-if-nodes">';
+
+      ifStories.forEach(ifStory => {
+        if (ifStory.chapters && ifStory.chapters.length > 0) {
+          const parentChapter = s.chapters.find(c => c.id === ifStory.parentChapterId);
+          const parentIdx = parentChapter ? s.chapters.indexOf(parentChapter) : 0;
+
+          // Calculate position (simplified)
+          const leftPos = 10 + (parentIdx * 20);
+
+          html += `
+            <div class="if-node" style="left:${leftPos}%;top:120px;">
+              <div class="timeline-node if-node" onclick="openStoryline(${ifStory.id})">
+                <div class="node-card">
+                  <div class="node-title">IF: ${escHtml(ifStory.name)}</div>
+                  <div class="node-chapter">${ifStory.chapters.length}章</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      html += '</div>';
+    }
+  } else {
+    // IF storyline: show independent timeline
+    const axisColor = s.isIndependent ? 'var(--accent-purple)' : 'var(--accent-silver)';
+    const axisLabel = s.isIndependent ? '&#127757; 独立世界线' : '&#10022; IF线时间轴';
+
+    html += `<div class="timeline-main-axis" style="--accent-gold:${axisColor};"><div class="timeline-axis-label" style="color:${axisColor};">${axisLabel}</div>`;
+
+    html += s.chapters.map((ch, idx) => `
+      <div class="timeline-node if-node" onclick="openChapterFromTimeline(${ch.id})">
+        <div class="node-card">
+          <div class="node-title">${escHtml(ch.title)}</div>
+          <div class="node-chapter">Ch.${idx + 1}</div>
+        </div>
+      </div>
+    `).join('');
+
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function openChapterFromTimeline(chapterId) {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+
+  currentChapterId = chapterId;
+  updateEditorTitle();
+  renderChapterTabs();
+  renderCurrentChapter();
+  renderAlbumLinks();
+  switchView('editorView');
+}
+
+// ==================== Album Links ====================
+function renderAlbumLinks() {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+  const list = document.getElementById('albumLinkList');
+  const albums = getFilteredAlbums();
+
+  if (albums.length === 0) {
+    list.innerHTML = '<div style="font-size:0.8em;color:var(--text-secondary);">暂无相册可关联</div>';
+    document.getElementById('linkedPreviewSection').style.display = 'none';
+    return;
+  }
+
+  list.innerHTML = albums.map(a => {
+    const checked = (s.linkedAlbums || []).includes(a.id) ? 'checked' : '';
+    const count = a.images ? a.images.length : 0;
+    return `<div class="album-link-item">
+      <input type="checkbox" ${checked} onchange="toggleAlbumLink(${a.id}, this.checked)">
+      <span class="link-name" onclick="this.previousElementSibling.click()">${escHtml(a.name)}</span>
+      <span class="link-count">${count}张</span>
+    </div>`;
+  }).join('');
+
+  renderLinkedPreview();
+}
+
+function toggleAlbumLink(albumId, checked) {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+  if (!s.linkedAlbums) s.linkedAlbums = [];
+  if (checked) {
+    if (!s.linkedAlbums.includes(albumId)) s.linkedAlbums.push(albumId);
+  } else {
+    s.linkedAlbums = s.linkedAlbums.filter(id => id !== albumId);
+  }
+  s.updatedAt = Date.now();
+  saveData();
+  renderLinkedPreview();
+}
+
+function renderLinkedPreview() {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s || !s.linkedAlbums || s.linkedAlbums.length === 0) {
+    document.getElementById('linkedPreviewSection').style.display = 'none';
+    return;
+  }
+  document.getElementById('linkedPreviewSection').style.display = 'block';
+  const container = document.getElementById('linkedPreview');
+  let images = [];
+  s.linkedAlbums.forEach(aId => {
+    const album = appData.albums.find(a => a.id === aId);
+    if (album && album.images) {
+      album.images.forEach(img => images.push(img));
+    }
+  });
+  // Show up to 9 previews
+  images = images.slice(0, 9);
+  container.innerHTML = images.map(img =>
+    `<img src="${img.data}" alt="" onclick="openLightbox(this.src)">`
+  ).join('');
+}
+
+function saveStoryContent() {
+  const s = appData.storylines.find(x => x.id === currentStorylineId);
+  if (!s) return;
+  const ch = s.chapters.find(c => c.id === currentChapterId);
+  if (!ch) return;
+  ch.content = document.getElementById('editorContent').innerHTML;
+  s.updatedAt = Date.now();
+  saveData();
+  showToast('已保存');
+}
+
+// Auto-save editor content periodically
+let autoSaveTimer;
+document.getElementById('editorContent').addEventListener('input', () => {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(() => {
+    const s = appData.storylines.find(x => x.id === currentStorylineId);
+    if (!s) return;
+    const ch = s.chapters.find(c => c.id === currentChapterId);
+    if (!ch) return;
+    ch.content = document.getElementById('editorContent').innerHTML;
+    s.updatedAt = Date.now();
+    saveData();
+  }, 2000);
+});
+
+// Rich text commands
+function execCmd(cmd, val) {
+  document.execCommand(cmd, false, val || null);
+  document.getElementById('editorContent').focus();
+}
+
+// ==================== View Switching ====================
+function switchView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack() {
+  // Save any pending content
+  if (currentStorylineId && currentChapterId) {
+    const s = appData.storylines.find(x => x.id === currentStorylineId);
+    if (s) {
+      const ch = s.chapters.find(c => c.id === currentChapterId);
+      if (ch) {
+        ch.content = document.getElementById('editorContent').innerHTML;
+      }
+      s.updatedAt = Date.now();
+      saveData();
+    }
+    currentStorylineId = null;
+    currentChapterId = null;
+  }
+  if (currentAlbumId) currentAlbumId = null;
+  switchView('mainView');
+  renderAlbums();
+  renderStorylines();
+}
+
+// ==================== Helpers ====================
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return '刚刚';
+  if (mins < 60) return mins + '分钟前';
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return hours + '小时前';
+  const days = Math.floor(hours / 24);
+  if (days < 30) return days + '天前';
+  return new Date(ts).toLocaleDateString('zh-CN');
+}
+
+// ==================== Init ====================
+renderCategories();
+renderAlbums();
+renderStorylines();
+
+// Keyboard shortcut: Escape to close modals
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+    closeLightbox();
+  }
+});
+
+// Enter key in input modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.getElementById('inputModal').classList.contains('active')) {
+    const input = document.querySelector('#inputModal input');
+    if (input && document.activeElement === input) {
+      document.getElementById('inputModalConfirm').click();
+    }
+  }
+});
+</script>
+</body>
+</html>

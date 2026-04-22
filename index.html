@@ -1075,6 +1075,281 @@ body {
 .relation-form-group .frosted-input {
   margin-bottom: 0;
 }
+
+/* ========== Cover Page ========== */
+.cover-page {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 9999;
+  background: linear-gradient(135deg, #0a0015 0%, #1a0533 30%, #0f0c29 60%, #1a0025 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.cover-page.hidden {
+  opacity: 0;
+  transform: scale(1.1);
+  pointer-events: none;
+}
+
+/* Cover sky particles */
+.cover-stars {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+}
+.cover-star {
+  position: absolute; width: 3px; height: 3px;
+  background: #fff; border-radius: 50%;
+  animation: twinkle var(--dur) ease-in-out infinite;
+  opacity: 0;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* Cover Moon */
+.cover-moon {
+  position: absolute; top: 8%; right: 12%;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff8dc, #ffe4b5 40%, #ffd70080 70%, transparent 100%);
+  box-shadow: 0 0 40px rgba(255,215,0,0.3), 0 0 80px rgba(255,215,0,0.15), 0 0 120px rgba(255,215,0,0.08);
+  animation: moonGlow 4s ease-in-out infinite;
+}
+.cover-moon::before {
+  content: ''; position: absolute;
+  top: -8px; left: 15px; width: 70px; height: 70px;
+  border-radius: 50%;
+  background: #0a0015;
+  opacity: 0.85;
+}
+@keyframes moonGlow {
+  0%, 100% { box-shadow: 0 0 40px rgba(255,215,0,0.3), 0 0 80px rgba(255,215,0,0.15); }
+  50% { box-shadow: 0 0 50px rgba(255,215,0,0.4), 0 0 100px rgba(255,215,0,0.2); }
+}
+
+/* Decorative Stars (larger, around title) */
+.cover-deco-star {
+  position: absolute;
+  color: #ffd700;
+  font-size: var(--size, 14px);
+  animation: starFloat var(--dur, 3s) ease-in-out infinite;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px rgba(255,215,0,0.6));
+}
+@keyframes starFloat {
+  0%, 100% { opacity: 0.4; transform: translateY(0) rotate(0deg); }
+  50% { opacity: 1; transform: translateY(-6px) rotate(20deg); }
+}
+
+/* Book */
+.cover-book-wrap {
+  position: relative;
+  width: 220px; height: 170px;
+  margin-bottom: 30px;
+  perspective: 800px;
+  animation: bookAppear 1.5s ease-out 0.3s both;
+}
+@keyframes bookAppear {
+  from { opacity: 0; transform: translateY(30px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cover-book {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+}
+
+/* Book spine */
+.book-spine {
+  position: absolute; left: -12px; top: 4px;
+  width: 18px; height: calc(100% - 4px);
+  background: linear-gradient(180deg, #5c1a3a, #3d1028);
+  border-radius: 4px 0 0 4px;
+  box-shadow: -3px 0 8px rgba(0,0,0,0.5);
+  transform: rotateY(0deg);
+}
+
+/* Book back cover */
+.book-back {
+  position: absolute; top: 4px; left: 4px;
+  width: calc(100% - 4px); height: calc(100% - 4px);
+  background: linear-gradient(135deg, #4a1432, #2d0c20);
+  border-radius: 2px 8px 8px 2px;
+  box-shadow: 4px 4px 20px rgba(0,0,0,0.6);
+}
+
+/* Book front cover */
+.book-front {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #8b2252 0%, #6b1a3f 40%, #5c1636 100%);
+  border-radius: 2px 10px 10px 2px;
+  border: 1px solid rgba(255,215,0,0.15);
+  box-shadow:
+    inset 0 0 30px rgba(0,0,0,0.3),
+    inset 0 0 60px rgba(92,22,54,0.5),
+    2px 2px 15px rgba(0,0,0,0.5);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+/* Book decorative border */
+.book-front::before {
+  content: '';
+  position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px;
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 4px 6px 6px 4px;
+  pointer-events: none;
+}
+.book-front::after {
+  content: '';
+  position: absolute; top: 14px; left: 14px; right: 14px; bottom: 14px;
+  border: 1px solid rgba(255,215,0,0.08);
+  border-radius: 2px 4px 4px 2px;
+  pointer-events: none;
+}
+
+/* Book corner ornaments */
+.book-corner {
+  position: absolute; width: 16px; height: 16px;
+  border-color: rgba(255,215,0,0.3);
+  border-style: solid;
+}
+.book-corner.tl { top: 10px; left: 10px; border-width: 1px 0 0 1px; border-radius: 2px 0 0 0; }
+.book-corner.tr { top: 10px; right: 10px; border-width: 1px 1px 0 0; border-radius: 0 2px 0 0; }
+.book-corner.bl { bottom: 10px; left: 10px; border-width: 0 0 1px 1px; border-radius: 0 0 0 2px; }
+.book-corner.br { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; border-radius: 0 0 2px 0; }
+
+/* Book emblem on cover */
+.book-emblem {
+  width: 44px; height: 44px;
+  border: 1px solid rgba(255,215,0,0.25);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
+  font-size: 20px;
+  opacity: 0.7;
+  background: rgba(255,215,0,0.04);
+}
+.book-cover-title {
+  font-size: 0.65em;
+  letter-spacing: 3px;
+  color: rgba(255,215,0,0.5);
+  text-transform: uppercase;
+}
+.book-glow {
+  position: absolute; top: 50%; left: 50%;
+  width: 140%; height: 140%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse, rgba(247,168,196,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  animation: bookBreath 4s ease-in-out infinite;
+}
+@keyframes bookBreath {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Title */
+.cover-title-wrap {
+  text-align: center;
+  animation: titleAppear 1.2s ease-out 0.8s both;
+  position: relative;
+  z-index: 2;
+}
+@keyframes titleAppear {
+  from { opacity: 0; transform: translateY(20px); letter-spacing: 2px; }
+  to { opacity: 1; transform: translateY(0); letter-spacing: 8px; }
+}
+.cover-title {
+  font-size: 2.8em; font-weight: 300;
+  letter-spacing: 8px;
+  background: linear-gradient(135deg, #ffd4e0, #f7a8c4, #e8b4d8, #c9a0dc, #a0c4ff);
+  background-size: 200% 200%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titleShimmer 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(247,168,196,0.3));
+  position: relative;
+}
+@keyframes titleShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.cover-subtitle {
+  font-size: 0.78em; color: rgba(255,255,255,0.4);
+  letter-spacing: 4px; margin-top: 8px;
+}
+
+/* Rose & Thorns SVG container */
+.cover-roses {
+  position: absolute;
+  width: 380px; height: 260px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+  animation: rosesAppear 2s ease-out 1.2s both;
+}
+@keyframes rosesAppear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Enter Button */
+.cover-enter-btn {
+  margin-top: 40px;
+  padding: 14px 40px;
+  border-radius: 28px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 1em;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.4s;
+  box-shadow: 0 4px 20px rgba(247,168,196,0.15);
+  animation: btnAppear 1s ease-out 1.8s both;
+  position: relative;
+  z-index: 2;
+  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+.cover-enter-btn:hover {
+  background: rgba(255,255,255,0.18);
+  box-shadow: 0 6px 30px rgba(247,168,196,0.3);
+  transform: translateY(-2px);
+  border-color: rgba(247,168,196,0.4);
+}
+.cover-enter-btn:active {
+  transform: translateY(0);
+}
+@keyframes btnAppear {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Floating thorn branches */
+.cover-branch {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Responsive cover */
+@media (max-width: 480px) {
+  .cover-title { font-size: 2em; letter-spacing: 4px; }
+  .cover-book-wrap { width: 160px; height: 125px; margin-bottom: 24px; }
+  .cover-roses { width: 280px; height: 200px; }
+  .cover-moon { width: 50px; height: 50px; top: 6%; right: 8%; }
+  .cover-moon::before { width: 45px; height: 45px; top: -5px; left: 10px; }
+  .cover-enter-btn { padding: 12px 28px; font-size: 0.9em; }
+}
 </style>
 </head>
 <body>
@@ -1084,6 +1359,121 @@ body {
   <div class="orb"></div><div class="orb"></div><div class="orb"></div>
   <div class="orb"></div><div class="orb"></div>
 </div>
+
+<!-- ==================== COVER PAGE ==================== -->
+<div class="cover-page" id="coverPage">
+  <!-- Background tiny stars -->
+  <div class="cover-stars" id="coverStars"></div>
+
+  <!-- Moon -->
+  <div class="cover-moon"></div>
+
+  <!-- Decorative stars around title -->
+  <div class="cover-deco-star" style="--size:12px;--dur:2.5s;top:28%;left:18%;animation-delay:0s;">&#10022;</div>
+  <div class="cover-deco-star" style="--size:18px;--dur:3.5s;top:22%;left:32%;animation-delay:0.5s;">&#10023;</div>
+  <div class="cover-deco-star" style="--size:10px;--dur:2.8s;top:25%;right:22%;animation-delay:0.3s;">&#10022;</div>
+  <div class="cover-deco-star" style="--size:14px;--dur:3.2s;top:32%;right:15%;animation-delay:0.8s;">&#10023;</div>
+  <div class="cover-deco-star" style="--size:8px;--dur:2.2s;top:35%;left:12%;animation-delay:1.1s;">&#10022;</div>
+  <div class="cover-deco-star" style="--size:16px;--dur:3s;top:20%;right:30%;animation-delay:0.6s;">&#10022;</div>
+  <div class="cover-deco-star" style="--size:10px;--dur:2.6s;top:38%;right:10%;animation-delay:1.4s;">&#10023;</div>
+  <div class="cover-deco-star" style="--size:12px;--dur:3.8s;top:30%;left:8%;animation-delay:0.9s;">&#10023;</div>
+
+  <!-- Rose & Thorns SVG -->
+  <div class="cover-roses">
+    <svg viewBox="0 0 380 260" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <!-- Left thorny branch -->
+      <path d="M40,200 Q60,160 80,140 Q95,125 90,100" stroke="#2d4a2d" stroke-width="2.5" fill="none"/>
+      <path d="M60,175 Q55,168 50,172" stroke="#2d4a2d" stroke-width="1.5" fill="none"/>
+      <path d="M72,155 Q80,148 76,142" stroke="#2d4a2d" stroke-width="1.5" fill="none"/>
+      <!-- Thorns left -->
+      <path d="M50,185 L42,178 L52,182" fill="#3d5a3d" stroke="none"/>
+      <path d="M65,162 L58,154 L68,158" fill="#3d5a3d" stroke="none"/>
+      <path d="M78,142 L72,134 L80,138" fill="#3d5a3d" stroke="none"/>
+      <path d="M86,118 L80,110 L88,114" fill="#3d5a3d" stroke="none"/>
+
+      <!-- Left rose cluster -->
+      <!-- Rose 1 (large) -->
+      <ellipse cx="85" cy="95" rx="14" ry="13" fill="#c4264f"/>
+      <ellipse cx="80" cy="90" rx="10" ry="9" fill="#d43662" opacity="0.8"/>
+      <ellipse cx="88" cy="88" rx="7" ry="7" fill="#e84676" opacity="0.6"/>
+      <ellipse cx="83" cy="86" rx="4" ry="4" fill="#f06090" opacity="0.5"/>
+      <!-- Rose 2 -->
+      <ellipse cx="100" cy="105" rx="10" ry="10" fill="#a01e40"/>
+      <ellipse cx="96" cy="101" rx="7" ry="7" fill="#c4264f" opacity="0.7"/>
+      <ellipse cx="98" cy="99" rx="4" ry="4" fill="#d43662" opacity="0.5"/>
+      <!-- Rose 3 (bud) -->
+      <ellipse cx="70" cy="108" rx="7" ry="9" fill="#b02048"/>
+      <ellipse cx="68" cy="104" rx="4" ry="5" fill="#d43662" opacity="0.6"/>
+      <!-- Leaves left -->
+      <path d="M55,165 Q40,155 35,160 Q42,168 55,165Z" fill="#1a4a2a" opacity="0.7"/>
+      <path d="M90,120 Q75,115 72,120 Q80,126 90,120Z" fill="#1a4a2a" opacity="0.6"/>
+      <path d="M75,138 Q62,130 58,135 Q66,142 75,138Z" fill="#1a4a2a" opacity="0.5"/>
+
+      <!-- Right thorny branch -->
+      <path d="M340,195 Q320,155 300,135 Q285,120 290,95" stroke="#2d4a2d" stroke-width="2.5" fill="none"/>
+      <path d="M320,170 Q325,163 330,167" stroke="#2d4a2d" stroke-width="1.5" fill="none"/>
+      <path d="M308,150 Q300,143 304,137" stroke="#2d4a2d" stroke-width="1.5" fill="none"/>
+      <!-- Thorns right -->
+      <path d="M330,180 L338,173 L328,177" fill="#3d5a3d" stroke="none"/>
+      <path d="M315,158 L322,150 L312,154" fill="#3d5a3d" stroke="none"/>
+      <path d="M302,138 L308,130 L300,134" fill="#3d5a3d" stroke="none"/>
+      <path d="M294,110 L300,102 L292,106" fill="#3d5a3d" stroke="none"/>
+
+      <!-- Right rose cluster -->
+      <!-- Rose 4 (large) -->
+      <ellipse cx="295" cy="88" rx="14" ry="13" fill="#c4264f"/>
+      <ellipse cx="300" cy="84" rx="10" ry="9" fill="#d43662" opacity="0.8"/>
+      <ellipse cx="292" cy="82" rx="7" ry="7" fill="#e84676" opacity="0.6"/>
+      <ellipse cx="297" cy="80" rx="4" ry="4" fill="#f06090" opacity="0.5"/>
+      <!-- Rose 5 -->
+      <ellipse cx="280" cy="100" rx="10" ry="10" fill="#a01e40"/>
+      <ellipse cx="284" cy="96" rx="7" ry="7" fill="#c4264f" opacity="0.7"/>
+      <ellipse cx="282" cy="94" rx="4" ry="4" fill="#d43662" opacity="0.5"/>
+      <!-- Rose 6 (bud) -->
+      <ellipse cx="308" cy="102" rx="7" ry="9" fill="#b02048"/>
+      <ellipse cx="310" cy="98" rx="4" ry="5" fill="#d43662" opacity="0.6"/>
+      <!-- Leaves right -->
+      <path d="M325,160 Q340,150 345,155 Q338,163 325,160Z" fill="#1a4a2a" opacity="0.7"/>
+      <path d="M290,115 Q305,110 308,115 Q300,121 290,115Z" fill="#1a4a2a" opacity="0.6"/>
+      <path d="M305,132 Q318,124 322,129 Q314,136 305,132Z" fill="#1a4a2a" opacity="0.5"/>
+
+      <!-- Connecting bottom branch -->
+      <path d="M80,200 Q140,190 190,195 Q240,190 300,200" stroke="#2d4a2d" stroke-width="2" fill="none"/>
+      <path d="M130,192 L126,184 L134,188" fill="#3d5a3d" stroke="none"/>
+      <path d="M250,192 L254,184 L246,188" fill="#3d5a3d" stroke="none"/>
+      <!-- Small bottom roses -->
+      <ellipse cx="190" cy="192" rx="6" ry="6" fill="#d43662" opacity="0.5"/>
+      <ellipse cx="190" cy="190" rx="3" ry="3" fill="#f06090" opacity="0.4"/>
+    </svg>
+  </div>
+
+  <!-- Book -->
+  <div class="cover-book-wrap">
+    <div class="cover-book">
+      <div class="book-spine"></div>
+      <div class="book-back"></div>
+      <div class="book-front">
+        <div class="book-corner tl"></div>
+        <div class="book-corner tr"></div>
+        <div class="book-corner bl"></div>
+        <div class="book-corner br"></div>
+        <div class="book-emblem">&#128141;</div>
+        <div class="book-cover-title">LOVE NOTES</div>
+      </div>
+      <div class="book-glow"></div>
+    </div>
+  </div>
+
+  <!-- Title -->
+  <div class="cover-title-wrap">
+    <div class="cover-title">恋爱手札</div>
+    <div class="cover-subtitle">~ Love Notes ~</div>
+  </div>
+
+  <!-- Enter Button -->
+  <button class="cover-enter-btn" onclick="enterApp()">进入你与ta的世界</button>
+</div>
+
 <!-- ==================== MAIN VIEW ==================== -->
 <div class="app-container">
   <div id="mainView" class="view active">
@@ -1383,6 +1773,37 @@ body {
 <!-- Toast -->
 <div id="toast" class="toast"></div>
 <script>
+// ==================== Cover Page ====================
+(function() {
+  // Generate random background stars
+  const starsContainer = document.getElementById('coverStars');
+  if (starsContainer) {
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.className = 'cover-star';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 100 + '%';
+      star.style.setProperty('--dur', (2 + Math.random() * 3) + 's');
+      star.style.animationDelay = (Math.random() * 4) + 's';
+      star.style.width = (1 + Math.random() * 2.5) + 'px';
+      star.style.height = star.style.width;
+      starsContainer.appendChild(star);
+    }
+  }
+})();
+
+function enterApp() {
+  const cover = document.getElementById('coverPage');
+  if (!cover) return;
+  cover.classList.add('hidden');
+  setTimeout(() => {
+    cover.style.display = 'none';
+    document.body.style.overflow = '';
+  }, 850);
+}
+// Prevent scroll when cover is visible
+document.body.style.overflow = 'hidden';
+
 // ==================== Data Layer ====================
 const STORAGE_KEY = 'loveNotesData';
 

@@ -3,234 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>梦境手札 · Dream Journal</title>
-/* ========== Header with Avatar ========== */
-.app-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 0 10px;
-}
-.app-header-left {
-  flex: 1;
-}
-.app-header-left h1 {
-  font-size: 1.6em;
-  font-weight: 300;
-  letter-spacing: 3px;
-  background: linear-gradient(135deg, #f7a8c4, #b39ddb, #93c5fd);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0;
-}
-.app-header-left .subtitle {
-  font-size: 0.75em;
-  color: var(--text-secondary);
-  letter-spacing: 2px;
-  margin-top: 4px;
-}
-.header-avatar-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 2px solid var(--accent-pink);
-  overflow: hidden;
-  cursor: pointer;
-  flex-shrink: 0;
-  background: rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-.header-avatar-wrap:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 16px rgba(247,168,196,0.4);
-}
-.header-avatar-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.header-avatar-wrap .avatar-placeholder {
-  font-size: 1.4em;
-  opacity: 0.5;
-}
-
-/* ========== Persona Section (under header) ========== */
-.persona-section {
-  margin-bottom: 20px;
-}
-.persona-section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.persona-section-header h3 {
-  font-size: 0.9em;
-  color: var(--text-secondary);
-  font-weight: 400;
-  letter-spacing: 1px;
-}
-.persona-section-header button {
-  background: rgba(255,255,255,0.08);
-  border: 1px dashed rgba(255,255,255,0.2);
-  color: var(--text-secondary);
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.75em;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.persona-section-header button:hover {
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-}
-.persona-cards-row {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.15) transparent;
-}
-.persona-cards-row::-webkit-scrollbar { height: 3px; }
-.persona-cards-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-
-.persona-mini {
-  min-width: 120px;
-  max-width: 160px;
-  padding: 12px;
-  flex-shrink: 0;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.persona-mini:hover { transform: translateY(-2px); }
-.persona-mini .pm-name {
-  font-size: 0.85em;
-  font-weight: 500;
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.persona-mini .pm-preview {
-  font-size: 0.7em;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  max-height: 54px;
-  overflow: hidden;
-  white-space: pre-wrap;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-.persona-mini .pm-actions {
-  display: flex;
-  gap: 4px;
-  margin-top: 6px;
-}
-.persona-mini .pm-actions button {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 0.7em;
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-.persona-mini .pm-actions button:hover { color: #fff; background: rgba(255,255,255,0.1); }
-.persona-mini .pm-actions .btn-del:hover { color: var(--danger); }
-
-.persona-empty-hint {
-  font-size: 0.78em;
-  color: var(--text-secondary);
-  padding: 10px 0;
-  opacity: 0.6;
-}
-
-/* ========== Persona Detail Modal ========== */
-.persona-modal { max-width: 420px; }
-.persona-modal textarea {
-  width: 100%;
-  min-height: 220px;
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: var(--radius-sm);
-  color: #fff;
-  font-size: 0.9em;
-  outline: none;
-  resize: vertical;
-  line-height: 1.7;
-  transition: border-color 0.3s;
-  font-family: inherit;
-}
-.persona-modal textarea:focus { border-color: var(--accent-pink); }
-.persona-modal textarea::placeholder { color: rgba(255,255,255,0.25); }
-
-/* ========== Persona Link in Editor Sidebar ========== */
-.persona-link-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  margin-bottom: 6px;
-  transition: all 0.2s;
-}
-.persona-link-item:hover { background: rgba(255,255,255,0.08); }
-.persona-link-item input[type="checkbox"] {
-  accent-color: var(--accent-purple);
-  width: 16px;
-  height: 16px;
-}
-.persona-link-item .link-name {
-  font-size: 0.85em;
-  cursor: pointer;
-  flex: 1;
-}
-.persona-link-item .link-tag {
-  font-size: 0.65em;
-  padding: 2px 8px;
-  border-radius: 8px;
-  background: rgba(179,157,219,0.2);
-  color: var(--accent-purple);
-}
-
-/* ========== Persona Full View Modal ========== */
-.persona-view-modal { max-width: 420px; text-align: left; }
-.persona-view-modal .pv-name {
-  font-size: 1.1em;
-  font-weight: 500;
-  margin-bottom: 12px;
-  text-align: center;
-}
-.persona-view-modal .pv-text {
-  font-size: 0.88em;
-  color: var(--text-secondary);
-  line-height: 1.8;
-  white-space: pre-wrap;
-  max-height: 50vh;
-  overflow-y: auto;
-  padding: 16px;
-  background: rgba(255,255,255,0.05);
-  border-radius: var(--radius-sm);
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.15) transparent;
-}
-.persona-view-modal .pv-text::-webkit-scrollbar { width: 4px; }
-.persona-view-modal .pv-text::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-.persona-view-modal .pv-linked {
-  font-size: 0.72em;
-  color: var(--text-secondary);
-  text-align: center;
-  margin-top: 12px;
-  opacity: 0.7;
-}<style>
+  <title>恋爱手札 · Love Notes</title>
+<style>
 /* ========== Reset & Base ========== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1015,6 +789,192 @@ body {
   .timeline-node .node-title { font-size: 0.75em; }
   .timeline-node .node-chapter { font-size: 0.6em; }
 }
+
+/* ========== Bottom Bar ========== */
+.bottom-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 0;
+  padding: 8px 0 12px;
+  background: rgba(15,12,41,0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  z-index: 100;
+}
+.bottom-bar .tab-item {
+  flex: 1; max-width: 120px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: none; border: none; color: rgba(255,255,255,0.5);
+  cursor: pointer; font-size: 0.75em; padding: 4px 8px;
+  transition: color 0.3s;
+}
+.bottom-bar .tab-item:hover { color: rgba(255,255,255,0.75); }
+.bottom-bar .tab-item.active { color: var(--accent-pink); }
+.bottom-bar .tab-icon { font-size: 1.4em; }
+
+/* ========== Header Row ========== */
+.app-header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 40px 0 20px;
+}
+.app-header-left { text-align: left; }
+.app-header-left h1 {
+  font-size: 2.4em; font-weight: 300; letter-spacing: 6px;
+  background: linear-gradient(135deg, #f7a8c4, #b39ddb, #93c5fd);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.app-header-left .subtitle {
+  font-size: 0.85em; color: var(--text-secondary);
+  letter-spacing: 4px; margin-top: 6px;
+}
+.header-avatar-wrap {
+  width: 52px; height: 52px; border-radius: 50%;
+  overflow: hidden; cursor: pointer;
+  border: 2px solid var(--accent-pink);
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.1);
+  transition: transform 0.2s;
+}
+.header-avatar-wrap:hover { transform: scale(1.08); }
+.header-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-placeholder { font-size: 1.6em; color: rgba(255,255,255,0.5); }
+
+/* ========== Persona Section (Main) ========== */
+.persona-section .persona-section-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+.persona-section .persona-section-header h3 {
+  font-size: 0.95em; font-weight: 400; letter-spacing: 1px;
+}
+.persona-section .persona-section-header button {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-secondary); padding: 4px 14px; border-radius: 12px;
+  cursor: pointer; font-size: 0.8em; transition: all 0.2s;
+}
+.persona-section .persona-section-header button:hover {
+  background: rgba(255,255,255,0.2); color: #fff;
+}
+.persona-cards-row {
+  display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
+}
+.persona-cards-row::-webkit-scrollbar { height: 3px; }
+.persona-cards-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+.persona-empty-hint { font-size: 0.82em; color: var(--text-secondary); padding: 8px 0; }
+.persona-mini {
+  min-width: 160px; padding: 10px 14px; cursor: pointer;
+  transition: all 0.2s; position: relative;
+}
+.persona-mini:hover { background: rgba(255,255,255,0.14); transform: translateY(-2px); }
+.persona-mini .pm-name { font-size: 0.88em; font-weight: 500; margin-bottom: 4px; }
+.persona-mini .pm-preview { font-size: 0.75em; color: var(--text-secondary); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.persona-mini .pm-actions {
+  position: absolute; top: 6px; right: 8px; display: flex; gap: 4px;
+}
+.persona-mini .pm-actions button {
+  background: none; border: none; color: var(--text-secondary);
+  cursor: pointer; font-size: 0.85em; padding: 2px 4px;
+  border-radius: 4px; transition: all 0.2s;
+}
+.persona-mini .pm-actions button:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.persona-mini .pm-actions .btn-del:hover { color: var(--danger); }
+
+/* ========== Profile View ========== */
+.profile-header {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 40px 20px 24px; margin-bottom: 20px;
+}
+.profile-avatar-wrap {
+  width: 80px; height: 80px; border-radius: 50%;
+  overflow: hidden; cursor: pointer; position: relative;
+  border: 3px solid var(--accent-pink);
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.1); transition: transform 0.2s;
+}
+.profile-avatar-wrap:hover { transform: scale(1.05); }
+.profile-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.profile-avatar-wrap .avatar-edit {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,0.6); color: #fff; font-size: 0.65em;
+  text-align: center; padding: 3px 0;
+}
+.profile-name { margin-top: 12px; }
+.profile-name-input {
+  background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2);
+  color: var(--text-primary); font-size: 1.1em; text-align: center;
+  padding: 4px 8px; outline: none; width: 160px;
+}
+.profile-name-input:focus { border-color: var(--accent-pink); }
+
+/* ========== Persona Grid (Profile) ========== */
+.persona-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px; margin-bottom: 16px;
+}
+.persona-card { padding: 16px; transition: all 0.3s; }
+.persona-card:hover { transform: translateY(-2px); background: rgba(255,255,255,0.14); }
+.persona-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.persona-name { font-weight: 500; font-size: 1em; }
+.persona-actions { display: flex; gap: 6px; }
+.persona-actions button {
+  background: rgba(255,255,255,0.08); border: none; color: var(--text-secondary);
+  padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8em;
+  transition: all 0.2s;
+}
+.persona-actions button:hover { background: rgba(255,255,255,0.18); color: #fff; }
+.persona-actions .btn-del:hover { color: var(--danger); }
+.persona-text {
+  font-size: 0.85em; color: var(--text-secondary); line-height: 1.6;
+  max-height: 80px; overflow: hidden; transition: max-height 0.3s;
+}
+.persona-text.expanded { max-height: none; }
+.btn-expand {
+  background: none; border: none; color: var(--accent-pink);
+  cursor: pointer; font-size: 0.78em; padding: 4px 0; margin-top: 4px;
+}
+.btn-expand:hover { text-decoration: underline; }
+.persona-linked {
+  margin-top: 8px; font-size: 0.78em; color: var(--accent-purple);
+}
+.btn-add-persona {
+  display: block; margin: 10px auto 0; padding: 10px 28px;
+  border-radius: 16px; background: rgba(255,255,255,0.06);
+  border: 1px dashed rgba(255,255,255,0.25);
+  color: var(--text-secondary); cursor: pointer; font-size: 0.88em;
+  transition: all 0.3s;
+}
+.btn-add-persona:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* ========== Persona View Modal ========== */
+.pv-name {
+  text-align: center; font-size: 1.15em; font-weight: 500;
+  margin-bottom: 16px; color: var(--accent-pink);
+}
+.pv-text {
+  font-size: 0.9em; line-height: 1.8; color: var(--text-secondary);
+  white-space: pre-wrap; max-height: 50vh; overflow-y: auto;
+  padding: 12px; background: rgba(255,255,255,0.04); border-radius: 8px;
+}
+.pv-linked {
+  margin-top: 12px; font-size: 0.82em; color: var(--accent-purple);
+  text-align: center;
+}
+
+/* ========== Persona Link Item (Editor Sidebar) ========== */
+.persona-link-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px; border-radius: 6px; margin-bottom: 4px;
+  transition: background 0.2s;
+}
+.persona-link-item:hover { background: rgba(255,255,255,0.06); }
+.persona-link-item input[type="checkbox"] { accent-color: var(--accent-pink); width: 16px; height: 16px; }
+.persona-link-item .link-name { font-size: 0.88em; cursor: pointer; flex: 1; }
+.persona-link-item .link-tag {
+  font-size: 0.68em; color: var(--accent-purple); background: rgba(179,157,219,0.15);
+  padding: 2px 8px; border-radius: 8px;
+}
 </style>
 </head>
 <body>
@@ -1030,8 +990,8 @@ body {
         <!-- Header with Avatar -->
     <div class="app-header-row">
       <div class="app-header-left">
-        <h1>梦境手札</h1>
-        <div class="subtitle">~ Dream Journal ~</div>
+        <h1>恋爱手札</h1>
+        <div class="subtitle">~ Love Notes ~</div>
       </div>
       <div class="header-avatar-wrap" onclick="changeAvatar()">
         <img id="headerAvatar" src="" alt="" style="display:none;">
@@ -1081,13 +1041,13 @@ body {
     </div>
   </div>
   <!-- ==================== PROFILE VIEW (MY) ==================== -->
-     <div class="profile-header">
+  <div id="profileView" class="view">
+    <div class="profile-header glass">
       <div class="profile-avatar-wrap" onclick="changeAvatar()">
         <img id="profileAvatar" src="" alt="" style="display:none;">
         <div class="avatar-placeholder" id="avatarPlaceholder">&#128100;</div>
         <div class="avatar-edit">更换头像</div>
       </div>
-      <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this.files)">
       <div class="profile-name">
         <input class="profile-name-input" id="profileName" value="梦旅人" 
                onchange="saveProfileName()" placeholder="点击修改昵称">
@@ -1100,7 +1060,7 @@ body {
       <div class="empty-icon">&#128221;</div>
       <div>还没有人设，点击下方添加</div>
     </div>
-    <button class="btn-add-persona" onclick="addPersona()">+ 添加人设</button>
+    <button class="btn-add-persona glass-sm" onclick="addPersona()">+ 添加人设</button>
   </div>
   <!-- ==================== ALBUM DETAIL VIEW ==================== -->
   <div id="albumView" class="view">
@@ -1265,22 +1225,7 @@ body {
 <div id="personaModal" class="modal-overlay">
   <div class="modal glass persona-modal">
     <h3 id="personaModalTitle">&#128221; 新建人设</h3>
-    <input type="text" id="personaNameField" placeholder="人设名称（如：自设/梦角）" 
-           style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.08);
-           border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;
-           font-size:0.95em;outline:none;margin-bottom:12px;">
-    <textarea id="personaTextField" placeholder="在这里写下人设描述，字数不限...&#10;&#10;例如：&#10;姓名：&#10;性格：&#10;外貌：&#10;背景故事：&#10;其他补充："></textarea>
-    <div class="btn-row" style="margin-top:16px;">
-      <button class="btn-cancel" onclick="closeModal('personaModal')">取消</button>
-      <button class="btn-confirm" id="personaModalConfirm">确认</button>
-    </div>
-  </div>
-</div>
-<!-- Persona Edit Modal -->
-<div id="personaModal" class="modal-overlay">
-  <div class="modal glass persona-modal">
-    <h3 id="personaModalTitle">&#128221; 新建人设</h3>
-    <input type="text" id="personaNameField" placeholder="人设名称（如：女主/梦角）"
+    <input type="text" id="personaNameField" placeholder="人设名称（如：女主/梦角）" 
            style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.08);
            border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;
            font-size:0.95em;outline:none;margin-bottom:12px;">
@@ -1291,6 +1236,7 @@ body {
     </div>
   </div>
 </div>
+
 
 <!-- Persona View Modal (read full text) -->
 <div id="personaViewModal" class="modal-overlay">
@@ -1310,7 +1256,7 @@ body {
 <div id="toast" class="toast"></div>
 <script>
 // ==================== Data Layer ====================
-const STORAGE_KEY = 'dreamJournalData';
+const STORAGE_KEY = 'loveNotesData';
 
 function getDefaultData() {
   return {
@@ -2210,7 +2156,6 @@ function timeAgo(ts) {
 }
 
 // ==================== Init ====================
-// ==================== Init ====================
 renderCategories();
 renderAlbums();
 renderStorylines();
@@ -2315,6 +2260,7 @@ function handleAvatarUpload(files) {
     const profile = getProfile();
     profile.avatar = e.target.result;
     saveData();
+    renderAvatar();
     renderProfile();
     showToast('头像已更新');
   };
@@ -2328,41 +2274,91 @@ function saveProfileName() {
   showToast('昵称已保存');
 }
 
+function renderAvatar() {
+  const profile = getProfile();
+  // Header avatar
+  const headerImg = document.getElementById('headerAvatar');
+  const headerPh = document.getElementById('headerAvatarPlaceholder');
+  if (headerImg && headerPh) {
+    if (profile.avatar) {
+      headerImg.src = profile.avatar;
+      headerImg.style.display = 'block';
+      headerPh.style.display = 'none';
+    } else {
+      headerImg.style.display = 'none';
+      headerPh.style.display = 'block';
+    }
+  }
+  // Profile avatar
+  const profileImg = document.getElementById('profileAvatar');
+  const profilePh = document.getElementById('avatarPlaceholder');
+  if (profileImg && profilePh) {
+    if (profile.avatar) {
+      profileImg.src = profile.avatar;
+      profileImg.style.display = 'block';
+      profilePh.style.display = 'none';
+    } else {
+      profileImg.style.display = 'none';
+      profilePh.style.display = 'block';
+    }
+  }
+}
+
 // ==================== Personas ====================
 function renderPersonas() {
   const profile = getProfile();
+
+  // Render persona grid in profileView
   const grid = document.getElementById('personaGrid');
   const empty = document.getElementById('personaEmpty');
+  if (grid) {
+    if (!profile.personas || profile.personas.length === 0) {
+      grid.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+    } else {
+      if (empty) empty.style.display = 'none';
+      grid.innerHTML = profile.personas.map(p => {
+        const linkedStories = appData.storylines.filter(s =>
+          s.linkedPersonas && s.linkedPersonas.includes(p.id)
+        );
+        const linkedNames = linkedStories.map(s => s.name).join('、');
+        const isLong = (p.text || '').length > 200;
 
-  if (!profile.personas || profile.personas.length === 0) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    return;
+        return `<div class="persona-card glass-sm" data-id="${p.id}">
+          <div class="persona-header">
+            <div class="persona-name">${escHtml(p.name)}</div>
+            <div class="persona-actions">
+              <button onclick="editPersona(${p.id})">&#9998; 编辑</button>
+              <button class="btn-del" onclick="deletePersona(${p.id})">&#128465;</button>
+            </div>
+          </div>
+          <div class="persona-text" id="personaText${p.id}">${escHtml(p.text || '')}</div>
+          ${isLong ? `<button class="btn-expand" onclick="togglePersonaExpand(${p.id})">展开全部</button>` : ''}
+          ${linkedNames ? `<div class="persona-linked">&#128279; 关联故事线: ${escHtml(linkedNames)}</div>` : ''}
+        </div>`;
+      }).join('');
+    }
   }
-  empty.style.display = 'none';
 
-  grid.innerHTML = profile.personas.map(p => {
-    // Find which storylines this persona is linked to
-    const linkedStories = appData.storylines.filter(s =>
-      s.linkedPersonas && s.linkedPersonas.includes(p.id)
-    );
-    const linkedNames = linkedStories.map(s => s.name).join('、');
-
-    const isLong = (p.text || '').length > 200;
-
-    return `<div class="persona-card glass-sm" data-id="${p.id}">
-      <div class="persona-header">
-        <div class="persona-name">${escHtml(p.name)}</div>
-        <div class="persona-actions">
-          <button onclick="editPersona(${p.id})">&#9998; 编辑</button>
-          <button class="btn-del" onclick="deletePersona(${p.id})">&#128465;</button>
-        </div>
-      </div>
-      <div class="persona-text" id="personaText${p.id}">${escHtml(p.text || '')}</div>
-      ${isLong ? `<button class="btn-expand" onclick="togglePersonaExpand(${p.id})">展开全部</button>` : ''}
-      ${linkedNames ? `<div class="persona-linked">&#128279; 关联故事线: ${escHtml(linkedNames)}</div>` : ''}
-    </div>`;
-  }).join('');
+  // Render persona mini cards in mainView
+  const row = document.getElementById('personaCardsRow');
+  if (row) {
+    if (!profile.personas || profile.personas.length === 0) {
+      row.innerHTML = '<div class="persona-empty-hint">还没有人设，点击「+ 添加」创建</div>';
+    } else {
+      row.innerHTML = profile.personas.map(p => {
+        const preview = (p.text || '').substring(0, 80);
+        return `<div class="persona-mini glass-sm" onclick="viewPersona(${p.id})">
+          <div class="pm-name">${escHtml(p.name)}</div>
+          <div class="pm-preview">${escHtml(preview)}</div>
+          <div class="pm-actions" onclick="event.stopPropagation();">
+            <button onclick="editPersona(${p.id})">&#9998;</button>
+            <button class="btn-del" onclick="deletePersona(${p.id})">&#128465;</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
 }
 
 function togglePersonaExpand(id) {
@@ -2398,6 +2394,7 @@ function addPersona() {
     saveData();
     closeModal('personaModal');
     renderPersonas();
+    renderPersonaLinks();
     showToast('人设已添加');
   };
   openModal('personaModal');
@@ -2444,6 +2441,22 @@ function deletePersona(id) {
     renderPersonaLinks();
     showToast('人设已删除');
   });
+}
+
+function viewPersona(id) {
+  const p = getProfile().personas.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('pvName').textContent = p.name;
+  document.getElementById('pvText').textContent = p.text || '（空）';
+
+  const linked = appData.storylines.filter(s => s.linkedPersonas && s.linkedPersonas.includes(id));
+  const linkedEl = document.getElementById('pvLinked');
+  if (linked.length > 0) {
+    linkedEl.textContent = '关联故事线: ' + linked.map(s => s.name).join('、');
+  } else {
+    linkedEl.textContent = '';
+  }
+  openModal('personaViewModal');
 }
 
 // ==================== Persona Links in Storyline Editor ====================
@@ -2567,217 +2580,6 @@ renderStorylines = function() {
         const span = document.createElement('span');
         span.style.color = 'var(--accent-purple)';
         span.innerHTML = '&#128221; 人设: ' + escHtml(personaNames);
-        meta.appendChild(span);
-      }
-    }
-  });
-};
-// ==================== Profile & Avatar ====================
-function getProfile() {
-  if (!appData.profile) {
-    appData.profile = { name: '梦旅人', avatar: '', personas: [] };
-    saveData();
-  }
-  return appData.profile;
-}
-
-function changeAvatar() {
-  document.getElementById('avatarInput').click();
-}
-
-function handleAvatarUpload(files) {
-  if (!files || !files[0]) return;
-  if (!files[0].type.startsWith('image/')) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const profile = getProfile();
-    profile.avatar = e.target.result;
-    saveData();
-    renderAvatar();
-    showToast('头像已更新');
-  };
-  reader.readAsDataURL(files[0]);
-}
-
-function renderAvatar() {
-  const profile = getProfile();
-  const img = document.getElementById('headerAvatar');
-  const ph = document.getElementById('headerAvatarPlaceholder');
-  if (profile.avatar) {
-    img.src = profile.avatar;
-    img.style.display = 'block';
-    ph.style.display = 'none';
-  } else {
-    img.style.display = 'none';
-    ph.style.display = 'block';
-  }
-}
-
-// ==================== Personas ====================
-function renderPersonas() {
-  const profile = getProfile();
-  const row = document.getElementById('personaCardsRow');
-  if (!profile.personas || profile.personas.length === 0) {
-    row.innerHTML = '<div class="persona-empty-hint">还没有人设，点击「+ 添加」创建</div>';
-    return;
-  }
-  row.innerHTML = profile.personas.map(p => {
-    const preview = (p.text || '').substring(0, 80);
-    return `<div class="persona-mini glass-sm" onclick="viewPersona(${p.id})">
-      <div class="pm-name">${escHtml(p.name)}</div>
-      <div class="pm-preview">${escHtml(preview)}</div>
-      <div class="pm-actions" onclick="event.stopPropagation();">
-        <button onclick="editPersona(${p.id})">&#9998;</button>
-        <button class="btn-del" onclick="deletePersona(${p.id})">&#128465;</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function addPersona() {
-  document.getElementById('personaModalTitle').innerHTML = '&#128221; 新建人设';
-  document.getElementById('personaNameField').value = '';
-  document.getElementById('personaTextField').value = '';
-  document.getElementById('personaModalConfirm').onclick = () => {
-    const name = document.getElementById('personaNameField').value.trim();
-    const text = document.getElementById('personaTextField').value;
-    if (!name) { showToast('请输入人设名称'); return; }
-    const profile = getProfile();
-    if (!profile.personas) profile.personas = [];
-    profile.personas.push({ id: genId(), name, text, createdAt: Date.now() });
-    saveData();
-    closeModal('personaModal');
-    renderPersonas();
-    renderPersonaLinks();
-    showToast('人设已添加');
-  };
-  openModal('personaModal');
-}
-
-function editPersona(id) {
-  const p = getProfile().personas.find(x => x.id === id);
-  if (!p) return;
-  document.getElementById('personaModalTitle').innerHTML = '&#9998; 编辑人设';
-  document.getElementById('personaNameField').value = p.name;
-  document.getElementById('personaTextField').value = p.text || '';
-  document.getElementById('personaModalConfirm').onclick = () => {
-    const name = document.getElementById('personaNameField').value.trim();
-    const text = document.getElementById('personaTextField').value;
-    if (!name) { showToast('请输入人设名称'); return; }
-    p.name = name;
-    p.text = text;
-    saveData();
-    closeModal('personaModal');
-    renderPersonas();
-    renderPersonaLinks();
-    showToast('人设已更新');
-  };
-  openModal('personaModal');
-}
-
-function deletePersona(id) {
-  const p = getProfile().personas.find(x => x.id === id);
-  if (!p) return;
-  showConfirm('删除人设', `确定要删除人设「${p.name}」吗？`, () => {
-    const profile = getProfile();
-    profile.personas = profile.personas.filter(x => x.id !== id);
-    appData.storylines.forEach(s => {
-      if (s.linkedPersonas) s.linkedPersonas = s.linkedPersonas.filter(pid => pid !== id);
-    });
-    saveData();
-    renderPersonas();
-    renderPersonaLinks();
-    showToast('人设已删除');
-  });
-}
-
-function viewPersona(id) {
-  const p = getProfile().personas.find(x => x.id === id);
-  if (!p) return;
-  document.getElementById('pvName').textContent = p.name;
-  document.getElementById('pvText').textContent = p.text || '（空）';
-
-  const linked = appData.storylines.filter(s => s.linkedPersonas && s.linkedPersonas.includes(id));
-  const linkedEl = document.getElementById('pvLinked');
-  if (linked.length > 0) {
-    linkedEl.textContent = '关联故事线: ' + linked.map(s => s.name).join('、');
-  } else {
-    linkedEl.textContent = '';
-  }
-  openModal('personaViewModal');
-}
-
-// ==================== Persona Links in Editor ====================
-function renderPersonaLinks() {
-  const profile = getProfile();
-  const s = appData.storylines.find(x => x.id === currentStorylineId);
-  if (!s) return;
-
-  let section = document.getElementById('personaLinkSection');
-  if (!section) {
-    const firstSection = document.querySelector('.editor-sidebar .sidebar-section');
-    if (!firstSection) return;
-    section = document.createElement('div');
-    section.id = 'personaLinkSection';
-    section.className = 'sidebar-section glass-sm';
-    firstSection.parentNode.insertBefore(section, firstSection.nextSibling);
-  }
-
-  if (!profile.personas || profile.personas.length === 0) {
-    section.innerHTML = '<h4>&#128221; 关联人设</h4><div style="font-size:0.8em;color:var(--text-secondary);">暂无人设</div>';
-    return;
-  }
-
-  section.innerHTML = '<h4>&#128221; 关联人设</h4>' +
-    profile.personas.map(p => {
-      const checked = (s.linkedPersonas || []).includes(p.id) ? 'checked' : '';
-      return `<div class="persona-link-item">
-        <input type="checkbox" ${checked} onchange="togglePersonaLink(${p.id}, this.checked)">
-        <span class="link-name" onclick="this.previousElementSibling.click()">${escHtml(p.name)}</span>
-        <span class="link-tag">人设</span>
-      </div>`;
-    }).join('');
-}
-
-function togglePersonaLink(personaId, checked) {
-  const s = appData.storylines.find(x => x.id === currentStorylineId);
-  if (!s) return;
-  if (!s.linkedPersonas) s.linkedPersonas = [];
-  if (checked) {
-    if (!s.linkedPersonas.includes(personaId)) s.linkedPersonas.push(personaId);
-  } else {
-    s.linkedPersonas = s.linkedPersonas.filter(id => id !== personaId);
-  }
-  s.updatedAt = Date.now();
-  saveData();
-}
-
-// Hook openStoryline to render persona links
-const _origOpenStoryline = openStoryline;
-openStoryline = function(id) {
-  _origOpenStoryline(id);
-  renderPersonaLinks();
-};
-
-// Hook renderStorylines to show persona info on cards
-const _origRenderStorylines = renderStorylines;
-renderStorylines = function() {
-  _origRenderStorylines();
-  const stories = getFilteredStorylines();
-  const cards = document.querySelectorAll('.storyline-card');
-  cards.forEach((card, idx) => {
-    const s = stories[idx];
-    if (!s || !s.linkedPersonas || s.linkedPersonas.length === 0) return;
-    const names = s.linkedPersonas.map(pid => {
-      const p = (appData.profile && appData.profile.personas) ? appData.profile.personas.find(x => x.id === pid) : null;
-      return p ? p.name : null;
-    }).filter(Boolean).join('、');
-    if (names) {
-      const meta = card.querySelector('.story-meta');
-      if (meta) {
-        const span = document.createElement('span');
-        span.style.color = 'var(--accent-purple)';
-        span.innerHTML = '&#128221; 人设: ' + escHtml(names);
         meta.appendChild(span);
       }
     }

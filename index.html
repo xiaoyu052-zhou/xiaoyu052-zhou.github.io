@@ -982,6 +982,48 @@ body {
   background: rgba(255,255,255,0.14); color: #fff;
 }
 
+/* ========== Global Frosted Button Override ========== */
+button, .btn-confirm, .btn-cancel, .btn-danger,
+.btn-back, .btn-edit-name, .btn-delete-album,
+.btn-save-story, .modal-cancel, .btn-add-category,
+.btn-add-chapter, .btn-expand, .btn-add-persona,
+.btn-timeline, .btn-add-worldview {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+}
+button:hover, .btn-confirm:hover, .btn-cancel:hover,
+.btn-back:hover, .btn-edit-name:hover,
+.btn-save-story:hover, .modal-cancel:hover,
+.btn-add-category:hover, .btn-add-chapter:hover,
+.btn-expand:hover, .btn-add-persona:hover,
+.btn-timeline:hover, .btn-add-worldview:hover {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+}
+.btn-danger:hover { background: rgba(255,107,107,0.6) !important; color: #fff; }
+.btn-delete-album:hover { background: rgba(255,107,107,0.3) !important; color: var(--danger); }
+.btn-del:hover { color: var(--danger) !important; }
+.btn-save-story {
+  background: linear-gradient(135deg, rgba(247,168,196,0.3), rgba(179,157,219,0.3)) !important;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+}
+.btn-save-story:hover { opacity: 0.85; }
+.modal-cancel {
+  display: block; margin: 20px auto 0;
+  padding: 10px 32px; border-radius: 20px;
+}
+.editor-toolbar button {
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  border-radius: 8px;
+}
+
 /* ========== Relationship Section ========== */
 .relation-section {
   margin-bottom: 24px;
@@ -1075,6 +1117,108 @@ body {
 .relation-form-group .frosted-input {
   margin-bottom: 0;
 }
+
+/* ========== Relation Network Graph ========== */
+.relation-network-wrap {
+  position: relative;
+  min-height: 200px;
+}
+.relation-worldview-block {
+  margin-bottom: 20px;
+}
+.relation-wv-title {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px; padding: 8px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+}
+.relation-wv-name {
+  font-size: 0.92em; font-weight: 500; letter-spacing: 1px;
+  color: var(--accent-purple);
+}
+.relation-wv-actions button {
+  background: none; border: none; color: var(--text-secondary);
+  cursor: pointer; font-size: 0.85em; padding: 4px 6px;
+  border-radius: 6px; transition: all 0.2s;
+}
+.relation-wv-actions button:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.relation-wv-actions .btn-del:hover { color: var(--danger); }
+.relation-net-svg {
+  width: 100%; min-height: 180px;
+}
+.rel-net-node {
+  cursor: pointer;
+}
+.rel-net-node circle {
+  transition: all 0.3s;
+}
+.rel-net-node:hover circle {
+  filter: brightness(1.3);
+}
+.rel-net-label {
+  font-size: 11px; fill: #fff; text-anchor: middle;
+  pointer-events: none; font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+}
+.rel-net-edge-label {
+  font-size: 9px; fill: var(--accent-pink); text-anchor: middle;
+  pointer-events: none; font-family: 'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+}
+
+/* ========== Worldview Section (Profile) ========== */
+.worldview-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px; margin-bottom: 16px;
+}
+.worldview-card {
+  padding: 18px; border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: all 0.3s; position: relative;
+}
+.worldview-card:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateY(-2px);
+}
+.wv-card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+.wv-card-name {
+  font-weight: 500; font-size: 1em;
+  color: var(--accent-purple);
+}
+.wv-card-actions button {
+  background: none; border: none; color: var(--text-secondary);
+  cursor: pointer; font-size: 0.85em; padding: 4px 6px;
+  border-radius: 6px; transition: all 0.2s;
+}
+.wv-card-actions button:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.wv-card-actions .btn-del:hover { color: var(--danger); }
+.wv-card-desc {
+  font-size: 0.82em; color: var(--text-secondary);
+  line-height: 1.5; margin-bottom: 10px;
+  display: -webkit-box; -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.wv-card-links {
+  font-size: 0.75em; color: var(--text-secondary);
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.wv-link-tag {
+  padding: 2px 8px; border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.btn-add-worldview {
+  display: block; margin: 10px auto 0; padding: 10px 28px;
+  border-radius: 16px; background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px dashed rgba(255,255,255,0.25);
+  color: var(--text-secondary); cursor: pointer; font-size: 0.88em;
+  transition: all 0.3s;
+}
+.btn-add-worldview:hover { background: rgba(255,255,255,0.12); color: #fff; }
 
 /* ========== Cover Page ========== */
 .cover-page {
@@ -1554,6 +1698,14 @@ body {
       <div>还没有人设，点击下方添加</div>
     </div>
     <button class="btn-add-persona glass-sm" onclick="addPersona()">+ 添加人设</button>
+
+    <div class="section-title">&#127757; 世界观</div>
+    <div id="worldviewGrid" class="worldview-grid"></div>
+    <div id="worldviewEmpty" class="empty-state" style="display:none;">
+      <div class="empty-icon">&#127757;</div>
+      <div>还没有世界观，点击下方添加</div>
+    </div>
+    <button class="btn-add-worldview" onclick="addWorldview()">+ 添加世界观</button>
   </div>
   <!-- ==================== ALBUM DETAIL VIEW ==================== -->
   <div id="albumView" class="view">
@@ -1740,8 +1892,13 @@ body {
 
 <!-- Relationship Edit Modal -->
 <div id="relationModal" class="modal-overlay">
-  <div class="modal glass relation-modal" style="max-width:520px;">
+  <div class="modal glass relation-modal" style="max-width:560px;">
     <h3 id="relationModalTitle">&#128141; 新建人物关系</h3>
+    <div class="relation-form-group">
+      <label>世界观名称</label>
+      <input type="text" id="relWorldviewField" class="frosted-input" placeholder="输入世界观名称（如：现代都市、架空魔法世界）" list="worldviewList">
+      <datalist id="worldviewList"></datalist>
+    </div>
     <div class="relation-form-group">
       <label>角色A</label>
       <input type="text" id="relChar1Field" class="frosted-input" placeholder="角色A的名称">
@@ -1761,6 +1918,33 @@ body {
     <div class="btn-row" style="margin-top:20px;">
       <button class="btn-glass-cancel" onclick="closeModal('relationModal')">取消</button>
       <button class="btn-glass-confirm" id="relationModalConfirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- Worldview Edit Modal -->
+<div id="worldviewModal" class="modal-overlay">
+  <div class="modal glass" style="max-width:560px;">
+    <h3 id="worldviewModalTitle">&#127757; 新建世界观</h3>
+    <div class="relation-form-group">
+      <label>世界观名称</label>
+      <input type="text" id="wvNameField" class="frosted-input" placeholder="如：现代都市、架空魔法世界...">
+    </div>
+    <div class="relation-form-group">
+      <label>世界观描述</label>
+      <textarea id="wvDescField" class="frosted-textarea" style="min-height:120px;" placeholder="描述这个世界的设定..."></textarea>
+    </div>
+    <div class="relation-form-group">
+      <label>关联故事线</label>
+      <div id="wvStorylineLinks" style="margin-bottom:10px;"></div>
+    </div>
+    <div class="relation-form-group">
+      <label>关联相册</label>
+      <div id="wvAlbumLinks"></div>
+    </div>
+    <div class="btn-row" style="margin-top:20px;">
+      <button class="btn-glass-cancel" onclick="closeModal('worldviewModal')">取消</button>
+      <button class="btn-glass-confirm" id="worldviewModalConfirm">确认</button>
     </div>
   </div>
 </div>
@@ -1814,6 +1998,7 @@ function getDefaultData() {
     albums: [],
     storylines: [],
     relationships: [],
+    worldviews: [],
     nextId: 1
   };
 }
@@ -2338,10 +2523,19 @@ function openStoryline(id) {
   const s = appData.storylines.find(x => x.id === id);
   if (!s) return;
 
-  // Initialize with default chapter if none exist
+  // Initialize with default chapter if none exist, ask for name
   if (!s.chapters || s.chapters.length === 0) {
-    s.chapters = [{ id: genId(), title: '第一章', content: '' }];
-    saveData();
+    showInputModal('新建第一章', '输入章节标题...', '第一章', (title) => {
+      s.chapters = [{ id: genId(), title, content: '' }];
+      saveData();
+      currentChapterId = s.chapters[0].id;
+      updateEditorTitle();
+      renderChapterTabs();
+      renderCurrentChapter();
+      renderAlbumLinks();
+      switchView('editorView');
+    });
+    return;
   }
 
   // Set current chapter to first chapter
@@ -2482,14 +2676,12 @@ function renderTimeline() {
 
   let html = '';
 
-  // Different display based on storyline type
   if (s.type === 'main') {
-    // Main storyline: show main axis + IF branches
-    html += '<div class="timeline-main-axis"><div class="timeline-axis-label">★ 主线轴</div>';
+    // Main storyline chapters
+    html += '<div class="timeline-main-axis" id="timelineMainAxis"><div class="timeline-axis-label">★ 主线轴</div>';
 
-    // Main chapters
     html += s.chapters.map((ch, idx) => `
-      <div class="timeline-node main-node" onclick="openChapterFromTimeline(${ch.id})">
+      <div class="timeline-node main-node" data-chapter-idx="${idx}" onclick="openChapterFromTimeline(${ch.id})">
         <div class="node-card">
           <div class="node-title">${escHtml(ch.title)}</div>
           <div class="node-chapter">Ch.${idx + 1}</div>
@@ -2499,39 +2691,39 @@ function renderTimeline() {
 
     html += '</div>';
 
-    // IF branches (only show linked IF lines, not independent ones)
+    // IF branches with connection lines
     const ifStories = appData.storylines.filter(st =>
       st.parentId === currentStorylineId && st.type === 'if' && !st.isIndependent
     );
 
     if (ifStories.length > 0) {
-      html += '<div class="timeline-if-nodes">';
+      // SVG overlay for connection lines
+      html += '<div style="position:relative;">';
+      html += `<svg id="timelineBranchSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;" xmlns="http://www.w3.org/2000/svg"></svg>`;
 
+      html += '<div style="display:flex;flex-direction:column;gap:16px;padding-top:20px;position:relative;z-index:1;">';
       ifStories.forEach(ifStory => {
         if (ifStory.chapters && ifStory.chapters.length > 0) {
           const parentChapter = s.chapters.find(c => c.id === ifStory.parentChapterId);
           const parentIdx = parentChapter ? s.chapters.indexOf(parentChapter) : 0;
-
-          // Calculate position (simplified)
-          const leftPos = 10 + (parentIdx * 20);
-
-          html += `
-            <div class="if-node" style="left:${leftPos}%;top:120px;">
-              <div class="timeline-node if-node" onclick="openStoryline(${ifStory.id})">
-                <div class="node-card">
-                  <div class="node-title">IF: ${escHtml(ifStory.name)}</div>
-                  <div class="node-chapter">${ifStory.chapters.length}章</div>
+          html += `<div class="timeline-if-row" data-parent-idx="${parentIdx}" style="padding:12px 16px;border-radius:12px;background:rgba(192,200,224,0.06);border:1px solid rgba(192,200,224,0.15);">
+            <div style="font-size:0.8em;color:var(--accent-silver);margin-bottom:8px;letter-spacing:1px;">&#10022; IF线：${escHtml(ifStory.name)}（从「${escHtml(parentChapter ? parentChapter.title : '起点')}」分叉）</div>
+            <div style="display:flex;gap:12px;overflow-x:auto;">
+              ${ifStory.chapters.map((ch, idx) => `
+                <div class="timeline-node if-node" onclick="openStoryline(${ifStory.id})" style="flex-shrink:0;">
+                  <div class="node-card" style="width:100px;">
+                    <div class="node-title">${escHtml(ch.title)}</div>
+                    <div class="node-chapter">Ch.${idx + 1}</div>
+                  </div>
                 </div>
-              </div>
+              `).join('')}
             </div>
-          `;
+          </div>`;
         }
       });
-
-      html += '</div>';
+      html += '</div></div>';
     }
   } else {
-    // IF storyline: show independent timeline
     const axisColor = s.isIndependent ? 'var(--accent-purple)' : 'var(--accent-silver)';
     const axisLabel = s.isIndependent ? '&#127757; 独立世界线' : '&#10022; IF线时间轴';
 
@@ -2550,6 +2742,47 @@ function renderTimeline() {
   }
 
   container.innerHTML = html;
+
+  // Draw SVG connection lines from main nodes to IF rows
+  if (s.type === 'main') {
+    setTimeout(() => drawTimelineBranchLines(), 50);
+  }
+}
+
+function drawTimelineBranchLines() {
+  const svg = document.getElementById('timelineBranchSvg');
+  const mainAxis = document.getElementById('timelineMainAxis');
+  if (!svg || !mainAxis) return;
+
+  const containerRect = svg.parentElement.getBoundingClientRect();
+  svg.setAttribute('height', containerRect.height);
+  svg.setAttribute('width', containerRect.width);
+
+  const mainNodes = mainAxis.querySelectorAll('.timeline-node.main-node');
+  const ifRows = document.querySelectorAll('.timeline-if-row');
+
+  let lines = '';
+  ifRows.forEach(row => {
+    const parentIdx = parseInt(row.dataset.parentIdx) || 0;
+    const mainNode = mainNodes[parentIdx];
+    if (!mainNode) return;
+
+    const mainRect = mainNode.getBoundingClientRect();
+    const rowRect = row.getBoundingClientRect();
+
+    const x1 = mainRect.left + mainRect.width / 2 - containerRect.left;
+    const y1 = mainRect.bottom - containerRect.top;
+    const x2 = rowRect.left + 40 - containerRect.left;
+    const y2 = rowRect.top - containerRect.top;
+    const midY = (y1 + y2) / 2;
+
+    lines += `<path d="M${x1},${y1} C${x1},${midY} ${x2},${midY} ${x2},${y2}"
+      fill="none" stroke="rgba(192,200,224,0.5)" stroke-width="2" stroke-dasharray="6,4"/>
+      <circle cx="${x1}" cy="${y1}" r="4" fill="var(--accent-gold)" opacity="0.7"/>
+      <circle cx="${x2}" cy="${y2}" r="4" fill="var(--accent-silver)" opacity="0.7"/>`;
+  });
+
+  svg.innerHTML = lines;
 }
 
 function openChapterFromTimeline(chapterId) {
@@ -2725,41 +2958,100 @@ function renderRelations() {
   }
   if (empty) empty.style.display = 'none';
 
-  grid.innerHTML = relations.map(r => {
-    return `<div class="relation-card">
-      <div class="rel-actions" onclick="event.stopPropagation();">
-        <button title="编辑" onclick="editRelation(${r.id})">&#9998;</button>
-        <button class="btn-del" title="删除" onclick="deleteRelation(${r.id})">&#128465;</button>
+  // Group by worldview
+  const groups = {};
+  relations.forEach(r => {
+    const wv = r.worldview || '未分类';
+    if (!groups[wv]) groups[wv] = [];
+    groups[wv].push(r);
+  });
+
+  let html = '';
+  Object.keys(groups).forEach(wv => {
+    const rels = groups[wv];
+    // Collect unique characters
+    const chars = [];
+    const charSet = new Set();
+    rels.forEach(r => {
+      if (!charSet.has(r.char1)) { charSet.add(r.char1); chars.push(r.char1); }
+      if (!charSet.has(r.char2)) { charSet.add(r.char2); chars.push(r.char2); }
+    });
+
+    // Layout: arrange nodes in a circle
+    const cx = 200, cy = 120, radius = Math.min(80, 30 * chars.length);
+    const positions = {};
+    chars.forEach((ch, i) => {
+      const angle = (2 * Math.PI * i / chars.length) - Math.PI / 2;
+      positions[ch] = {
+        x: Math.round(cx + radius * Math.cos(angle)),
+        y: Math.round(cy + radius * Math.sin(angle))
+      };
+    });
+
+    const svgW = 400, svgH = 240;
+
+    let svgContent = '';
+    // Draw edges
+    rels.forEach(r => {
+      const p1 = positions[r.char1];
+      const p2 = positions[r.char2];
+      if (!p1 || !p2) return;
+      const mx = (p1.x + p2.x) / 2;
+      const my = (p1.y + p2.y) / 2 - 8;
+      svgContent += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="rgba(247,168,196,0.4)" stroke-width="1.5"/>`;
+      svgContent += `<text class="rel-net-edge-label" x="${mx}" y="${my}">${escHtml(r.type)}</text>`;
+    });
+    // Draw nodes
+    chars.forEach(ch => {
+      const pos = positions[ch];
+      svgContent += `<g class="rel-net-node" onclick="editRelationByChar('${escHtml(ch)}','${escHtml(wv)}')">`;
+      svgContent += `<circle cx="${pos.x}" cy="${pos.y}" r="22" fill="rgba(179,157,219,0.3)" stroke="rgba(179,157,219,0.6)" stroke-width="1.5"/>`;
+      svgContent += `<text class="rel-net-label" x="${pos.x}" y="${pos.y + 4}">${escHtml(ch.length > 4 ? ch.substring(0,4) : ch)}</text>`;
+      svgContent += `</g>`;
+    });
+
+    html += `<div class="relation-worldview-block">
+      <div class="relation-wv-title">
+        <span class="relation-wv-name">&#127757; ${escHtml(wv)}</span>
+        <span class="relation-wv-actions">${rels.map(r =>
+          `<button title="编辑" onclick="editRelation(${r.id})">&#9998;</button><button class="btn-del" title="删除" onclick="deleteRelation(${r.id})">&#128465;</button>`
+        ).join('')}</span>
       </div>
-      <div class="rel-top">
-        <span class="rel-char1">${escHtml(r.char1)}</span>
-        <span class="rel-arrow">&#10084;</span>
-        <span class="rel-char2">${escHtml(r.char2)}</span>
-      </div>
-      <div class="rel-type">${escHtml(r.type)}</div>
-      ${r.desc ? `<div class="rel-desc">${escHtml(r.desc)}</div>` : ''}
+      <svg class="rel-net-svg" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>
     </div>`;
-  }).join('');
+  });
+
+  grid.innerHTML = html;
+}
+
+function editRelationByChar(charName, worldview) {
+  const rels = getRelations().filter(r => (r.worldview || '未分类') === worldview && (r.char1 === charName || r.char2 === charName));
+  if (rels.length > 0) editRelation(rels[0].id);
 }
 
 function addRelation() {
   document.getElementById('relationModalTitle').innerHTML = '&#128141; 新建人物关系';
+  document.getElementById('relWorldviewField').value = '';
   document.getElementById('relChar1Field').value = '';
   document.getElementById('relChar2Field').value = '';
   document.getElementById('relTypeField').value = '';
   document.getElementById('relDescField').value = '';
+  // Fill worldview datalist
+  updateWorldviewDatalist();
 
   document.getElementById('relationModalConfirm').onclick = () => {
+    const worldview = document.getElementById('relWorldviewField').value.trim();
     const char1 = document.getElementById('relChar1Field').value.trim();
     const char2 = document.getElementById('relChar2Field').value.trim();
     const type = document.getElementById('relTypeField').value.trim();
     const desc = document.getElementById('relDescField').value;
+    if (!worldview) { showToast('请填写世界观名称'); return; }
     if (!char1 || !char2) { showToast('请填写两个角色名称'); return; }
     if (!type) { showToast('请填写关系类型'); return; }
 
     if (!appData.relationships) appData.relationships = [];
     appData.relationships.push({
-      id: genId(), char1, char2, type, desc,
+      id: genId(), worldview, char1, char2, type, desc,
       createdAt: Date.now()
     });
     saveData();
@@ -2775,19 +3067,24 @@ function editRelation(id) {
   if (!r) return;
 
   document.getElementById('relationModalTitle').innerHTML = '&#9998; 编辑人物关系';
+  document.getElementById('relWorldviewField').value = r.worldview || '';
   document.getElementById('relChar1Field').value = r.char1;
   document.getElementById('relChar2Field').value = r.char2;
   document.getElementById('relTypeField').value = r.type;
   document.getElementById('relDescField').value = r.desc || '';
+  updateWorldviewDatalist();
 
   document.getElementById('relationModalConfirm').onclick = () => {
+    const worldview = document.getElementById('relWorldviewField').value.trim();
     const char1 = document.getElementById('relChar1Field').value.trim();
     const char2 = document.getElementById('relChar2Field').value.trim();
     const type = document.getElementById('relTypeField').value.trim();
     const desc = document.getElementById('relDescField').value;
+    if (!worldview) { showToast('请填写世界观名称'); return; }
     if (!char1 || !char2) { showToast('请填写两个角色名称'); return; }
     if (!type) { showToast('请填写关系类型'); return; }
 
+    r.worldview = worldview;
     r.char1 = char1;
     r.char2 = char2;
     r.type = type;
@@ -2798,6 +3095,13 @@ function editRelation(id) {
     showToast('关系已更新');
   };
   openModal('relationModal');
+}
+
+function updateWorldviewDatalist() {
+  const dl = document.getElementById('worldviewList');
+  if (!dl) return;
+  const wvs = [...new Set(getRelations().map(r => r.worldview).filter(Boolean))];
+  dl.innerHTML = wvs.map(w => `<option value="${escHtml(w)}">`).join('');
 }
 
 function deleteRelation(id) {
@@ -2811,6 +3115,160 @@ function deleteRelation(id) {
   });
 }
 
+// ==================== Worldviews ====================
+function getWorldviews() {
+  if (!appData.worldviews) appData.worldviews = [];
+  return appData.worldviews;
+}
+
+function renderWorldviews() {
+  const wvs = getWorldviews();
+  const grid = document.getElementById('worldviewGrid');
+  const empty = document.getElementById('worldviewEmpty');
+  if (!grid) return;
+
+  if (wvs.length === 0) {
+    grid.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  grid.innerHTML = wvs.map(wv => {
+    const linkedStoryNames = (wv.linkedStorylines || []).map(sId => {
+      const s = appData.storylines.find(x => x.id === sId);
+      return s ? s.name : null;
+    }).filter(Boolean);
+    const linkedAlbumNames = (wv.linkedAlbums || []).map(aId => {
+      const a = appData.albums.find(x => x.id === aId);
+      return a ? a.name : null;
+    }).filter(Boolean);
+
+    return `<div class="worldview-card">
+      <div class="wv-card-header">
+        <span class="wv-card-name">&#127757; ${escHtml(wv.name)}</span>
+        <span class="wv-card-actions">
+          <button title="编辑" onclick="editWorldview(${wv.id})">&#9998;</button>
+          <button class="btn-del" title="删除" onclick="deleteWorldview(${wv.id})">&#128465;</button>
+        </span>
+      </div>
+      ${wv.desc ? `<div class="wv-card-desc">${escHtml(wv.desc)}</div>` : ''}
+      <div class="wv-card-links">
+        ${linkedStoryNames.map(n => `<span class="wv-link-tag">&#128214; ${escHtml(n)}</span>`).join('')}
+        ${linkedAlbumNames.map(n => `<span class="wv-link-tag">&#128247; ${escHtml(n)}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderWvLinkOptions(linkedStorylines, linkedAlbums) {
+  const slDiv = document.getElementById('wvStorylineLinks');
+  const alDiv = document.getElementById('wvAlbumLinks');
+
+  if (slDiv) {
+    const stories = appData.storylines || [];
+    if (stories.length === 0) {
+      slDiv.innerHTML = '<div style="font-size:0.8em;color:var(--text-secondary);">暂无故事线</div>';
+    } else {
+      slDiv.innerHTML = stories.map(s => {
+        const checked = (linkedStorylines || []).includes(s.id) ? 'checked' : '';
+        return `<div class="album-link-item">
+          <input type="checkbox" ${checked} data-wv-story="${s.id}">
+          <span class="link-name" onclick="this.previousElementSibling.click()">${escHtml(s.name)}</span>
+          <span class="link-tag">${s.type === 'main' ? '主线' : 'IF'}</span>
+        </div>`;
+      }).join('');
+    }
+  }
+  if (alDiv) {
+    const albums = appData.albums || [];
+    if (albums.length === 0) {
+      alDiv.innerHTML = '<div style="font-size:0.8em;color:var(--text-secondary);">暂无相册</div>';
+    } else {
+      alDiv.innerHTML = albums.map(a => {
+        const checked = (linkedAlbums || []).includes(a.id) ? 'checked' : '';
+        return `<div class="album-link-item">
+          <input type="checkbox" ${checked} data-wv-album="${a.id}">
+          <span class="link-name" onclick="this.previousElementSibling.click()">${escHtml(a.name)}</span>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+
+function collectWvLinks() {
+  const storyIds = [];
+  document.querySelectorAll('[data-wv-story]:checked').forEach(cb => {
+    storyIds.push(parseInt(cb.dataset.wvStory));
+  });
+  const albumIds = [];
+  document.querySelectorAll('[data-wv-album]:checked').forEach(cb => {
+    albumIds.push(parseInt(cb.dataset.wvAlbum));
+  });
+  return { storyIds, albumIds };
+}
+
+function addWorldview() {
+  document.getElementById('worldviewModalTitle').innerHTML = '&#127757; 新建世界观';
+  document.getElementById('wvNameField').value = '';
+  document.getElementById('wvDescField').value = '';
+  renderWvLinkOptions([], []);
+
+  document.getElementById('worldviewModalConfirm').onclick = () => {
+    const name = document.getElementById('wvNameField').value.trim();
+    const desc = document.getElementById('wvDescField').value;
+    if (!name) { showToast('请填写世界观名称'); return; }
+    const { storyIds, albumIds } = collectWvLinks();
+    if (!appData.worldviews) appData.worldviews = [];
+    appData.worldviews.push({
+      id: genId(), name, desc,
+      linkedStorylines: storyIds, linkedAlbums: albumIds,
+      createdAt: Date.now()
+    });
+    saveData();
+    closeModal('worldviewModal');
+    renderWorldviews();
+    showToast('世界观已添加');
+  };
+  openModal('worldviewModal');
+}
+
+function editWorldview(id) {
+  const wv = getWorldviews().find(x => x.id === id);
+  if (!wv) return;
+  document.getElementById('worldviewModalTitle').innerHTML = '&#9998; 编辑世界观';
+  document.getElementById('wvNameField').value = wv.name;
+  document.getElementById('wvDescField').value = wv.desc || '';
+  renderWvLinkOptions(wv.linkedStorylines || [], wv.linkedAlbums || []);
+
+  document.getElementById('worldviewModalConfirm').onclick = () => {
+    const name = document.getElementById('wvNameField').value.trim();
+    const desc = document.getElementById('wvDescField').value;
+    if (!name) { showToast('请填写世界观名称'); return; }
+    const { storyIds, albumIds } = collectWvLinks();
+    wv.name = name;
+    wv.desc = desc;
+    wv.linkedStorylines = storyIds;
+    wv.linkedAlbums = albumIds;
+    saveData();
+    closeModal('worldviewModal');
+    renderWorldviews();
+    showToast('世界观已更新');
+  };
+  openModal('worldviewModal');
+}
+
+function deleteWorldview(id) {
+  const wv = getWorldviews().find(x => x.id === id);
+  if (!wv) return;
+  showConfirm('删除世界观', `确定要删除世界观「${wv.name}」吗？`, () => {
+    appData.worldviews = getWorldviews().filter(x => x.id !== id);
+    saveData();
+    renderWorldviews();
+    showToast('世界观已删除');
+  });
+}
+
 // ==================== Init ====================
 renderCategories();
 renderAlbums();
@@ -2818,6 +3276,7 @@ renderStorylines();
 renderAvatar();
 renderPersonas();
 renderRelations();
+renderWorldviews();
 // Keyboard shortcut: Escape to close modals
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
@@ -2864,6 +3323,7 @@ function switchTab(tabId, btn) {
     renderRelations();
   } else if (tabId === 'profileView') {
     renderProfile();
+    renderWorldviews();
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });

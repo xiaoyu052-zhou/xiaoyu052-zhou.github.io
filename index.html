@@ -840,47 +840,6 @@ body {
 .header-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
 .avatar-placeholder { font-size: 1.6em; color: rgba(255,255,255,0.5); }
 
-/* ========== Persona Section (Main) ========== */
-.persona-section .persona-section-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 12px;
-}
-.persona-section .persona-section-header h3 {
-  font-size: 0.95em; font-weight: 400; letter-spacing: 1px;
-}
-.persona-section .persona-section-header button {
-  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
-  color: var(--text-secondary); padding: 4px 14px; border-radius: 12px;
-  cursor: pointer; font-size: 0.8em; transition: all 0.2s;
-}
-.persona-section .persona-section-header button:hover {
-  background: rgba(255,255,255,0.2); color: #fff;
-}
-.persona-cards-row {
-  display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
-}
-.persona-cards-row::-webkit-scrollbar { height: 3px; }
-.persona-cards-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-.persona-empty-hint { font-size: 0.82em; color: var(--text-secondary); padding: 8px 0; }
-.persona-mini {
-  min-width: 160px; padding: 10px 14px; cursor: pointer;
-  transition: all 0.2s; position: relative;
-}
-.persona-mini:hover { background: rgba(255,255,255,0.14); transform: translateY(-2px); }
-.persona-mini .pm-name { font-size: 0.88em; font-weight: 500; margin-bottom: 4px; }
-.persona-mini .pm-preview { font-size: 0.75em; color: var(--text-secondary); line-height: 1.4;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.persona-mini .pm-actions {
-  position: absolute; top: 6px; right: 8px; display: flex; gap: 4px;
-}
-.persona-mini .pm-actions button {
-  background: none; border: none; color: var(--text-secondary);
-  cursor: pointer; font-size: 0.85em; padding: 2px 4px;
-  border-radius: 4px; transition: all 0.2s;
-}
-.persona-mini .pm-actions button:hover { background: rgba(255,255,255,0.1); color: #fff; }
-.persona-mini .pm-actions .btn-del:hover { color: var(--danger); }
-
 /* ========== Profile View ========== */
 .profile-header {
   display: flex; flex-direction: column; align-items: center;
@@ -975,6 +934,147 @@ body {
   font-size: 0.68em; color: var(--accent-purple); background: rgba(179,157,219,0.15);
   padding: 2px 8px; border-radius: 8px;
 }
+
+/* ========== Frosted Inputs & Buttons ========== */
+.frosted-input {
+  width: 100%; padding: 14px 18px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px; color: #fff; font-size: 0.95em;
+  outline: none; margin-bottom: 14px; transition: border-color 0.3s;
+}
+.frosted-input:focus { border-color: var(--accent-pink); }
+
+.frosted-textarea {
+  width: 100%; padding: 14px 18px; min-height: 200px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px; color: #fff; font-size: 0.95em;
+  outline: none; resize: vertical; line-height: 1.7;
+  transition: border-color 0.3s;
+}
+.frosted-textarea:focus { border-color: var(--accent-pink); }
+
+.btn-glass-confirm {
+  padding: 12px 32px; border-radius: 20px;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff; font-size: 0.92em; cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 16px rgba(247,168,196,0.15);
+}
+.btn-glass-confirm:hover {
+  background: rgba(255,255,255,0.22);
+  box-shadow: 0 6px 24px rgba(247,168,196,0.25);
+}
+.btn-glass-cancel {
+  padding: 12px 32px; border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-secondary); font-size: 0.92em; cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-glass-cancel:hover {
+  background: rgba(255,255,255,0.14); color: #fff;
+}
+
+/* ========== Relationship Section ========== */
+.relation-section {
+  margin-bottom: 24px;
+}
+.relation-section .relation-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+.relation-section .relation-header h3 {
+  font-size: 1em; font-weight: 400; letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+.relation-section .relation-header button {
+  padding: 6px 16px; border-radius: 14px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-secondary); cursor: pointer; font-size: 0.82em;
+  transition: all 0.3s;
+}
+.relation-section .relation-header button:hover {
+  background: rgba(255,255,255,0.18); color: #fff;
+}
+.relation-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.relation-card {
+  padding: 16px 18px; border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: all 0.3s; position: relative;
+}
+.relation-card:hover {
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(31,38,135,0.2);
+}
+.relation-card .rel-top {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+}
+.relation-card .rel-char1 {
+  font-weight: 500; font-size: 0.95em;
+  min-width: 60px; text-align: center;
+}
+.relation-card .rel-arrow {
+  font-size: 1.1em; color: var(--accent-pink); flex-shrink: 0;
+}
+.relation-card .rel-char2 {
+  font-weight: 500; font-size: 0.95em;
+  min-width: 60px; text-align: center;
+}
+.relation-card .rel-type {
+  font-size: 0.8em; color: var(--accent-pink);
+  background: rgba(247,168,196,0.12);
+  padding: 3px 12px; border-radius: 10px;
+  display: inline-block;
+}
+.relation-card .rel-desc {
+  font-size: 0.82em; color: var(--text-secondary);
+  margin-top: 8px; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.relation-card .rel-actions {
+  position: absolute; top: 10px; right: 12px;
+  display: flex; gap: 4px;
+}
+.relation-card .rel-actions button {
+  background: none; border: none; color: var(--text-secondary);
+  cursor: pointer; font-size: 0.85em; padding: 4px 6px;
+  border-radius: 6px; transition: all 0.2s;
+}
+.relation-card .rel-actions button:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.relation-card .rel-actions .btn-del:hover { color: var(--danger); }
+.relation-empty {
+  text-align: center; padding: 24px; color: var(--text-secondary);
+  font-size: 0.88em;
+}
+
+/* ========== Relationship Modal ========== */
+.relation-modal { max-width: 520px; }
+.relation-form-group {
+  margin-bottom: 14px;
+}
+.relation-form-group label {
+  display: block; font-size: 0.82em; color: var(--text-secondary);
+  margin-bottom: 6px; letter-spacing: 0.5px;
+}
+.relation-form-group .frosted-input {
+  margin-bottom: 0;
+}
 </style>
 </head>
 <body>
@@ -1000,15 +1100,6 @@ body {
     </div>
     <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this.files)">
 
-    <!-- Persona Section -->
-    <div class="persona-section glass-sm" id="personaSection" style="padding:14px 16px;margin-bottom:20px;">
-      <div class="persona-section-header">
-        <h3>&#128221; 我的人设</h3>
-        <button onclick="addPersona()">+ 添加</button>
-      </div>
-      <div id="personaCardsRow" class="persona-cards-row"></div>
-    </div>
-
     <!-- Category Bar -->
     <div id="categoryBar" class="category-bar glass"></div>
 
@@ -1021,6 +1112,18 @@ body {
       <div class="action-card glass" onclick="showStorylineModal()">
         <div class="icon">&#128214;</div>
         <div class="label">新建故事线</div>
+      </div>
+    </div>
+
+    <!-- Relationship Section -->
+    <div class="relation-section">
+      <div class="relation-header">
+        <h3>&#128141; 人物关系</h3>
+        <button onclick="addRelation()">+ 新建关系</button>
+      </div>
+      <div id="relationGrid" class="relation-grid"></div>
+      <div id="relationEmpty" class="relation-empty" style="display:none;">
+        还没有人物关系，点击「+ 新建关系」添加
       </div>
     </div>
 
@@ -1223,16 +1326,13 @@ body {
 </div>
 <!-- Persona Edit Modal -->
 <div id="personaModal" class="modal-overlay">
-  <div class="modal glass persona-modal">
+  <div class="modal glass persona-modal" style="max-width:560px;">
     <h3 id="personaModalTitle">&#128221; 新建人设</h3>
-    <input type="text" id="personaNameField" placeholder="人设名称（如：女主/梦角）" 
-           style="width:100%;padding:10px 14px;background:rgba(255,255,255,0.08);
-           border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;
-           font-size:0.95em;outline:none;margin-bottom:12px;">
-    <textarea id="personaTextField" placeholder="在这里写下人设描述，字数不限...&#10;&#10;例如：&#10;姓名：&#10;性格：&#10;外貌：&#10;背景故事：&#10;特殊能力："></textarea>
-    <div class="btn-row" style="margin-top:16px;">
-      <button class="btn-cancel" onclick="closeModal('personaModal')">取消</button>
-      <button class="btn-confirm" id="personaModalConfirm">确认</button>
+    <input type="text" id="personaNameField" placeholder="人设名称（如：女主/梦角）" class="frosted-input">
+    <textarea id="personaTextField" class="frosted-textarea" placeholder="在这里写下人设描述，字数不限...&#10;&#10;例如：&#10;姓名：&#10;性格：&#10;外貌：&#10;背景故事：&#10;特殊能力："></textarea>
+    <div class="btn-row" style="margin-top:20px;">
+      <button class="btn-glass-cancel" onclick="closeModal('personaModal')">取消</button>
+      <button class="btn-glass-confirm" id="personaModalConfirm">确认</button>
     </div>
   </div>
 </div>
@@ -1247,6 +1347,34 @@ body {
     <button class="modal-cancel" style="margin-top:16px;" onclick="closeModal('personaViewModal')">关闭</button>
   </div>
 </div>
+
+<!-- Relationship Edit Modal -->
+<div id="relationModal" class="modal-overlay">
+  <div class="modal glass relation-modal" style="max-width:520px;">
+    <h3 id="relationModalTitle">&#128141; 新建人物关系</h3>
+    <div class="relation-form-group">
+      <label>角色A</label>
+      <input type="text" id="relChar1Field" class="frosted-input" placeholder="角色A的名称">
+    </div>
+    <div class="relation-form-group">
+      <label>角色B</label>
+      <input type="text" id="relChar2Field" class="frosted-input" placeholder="角色B的名称">
+    </div>
+    <div class="relation-form-group">
+      <label>关系类型</label>
+      <input type="text" id="relTypeField" class="frosted-input" placeholder="如：恋人、青梅竹马、宿敌...">
+    </div>
+    <div class="relation-form-group">
+      <label>关系描述</label>
+      <textarea id="relDescField" class="frosted-textarea" style="min-height:100px;" placeholder="描述他们之间的关系..."></textarea>
+    </div>
+    <div class="btn-row" style="margin-top:20px;">
+      <button class="btn-glass-cancel" onclick="closeModal('relationModal')">取消</button>
+      <button class="btn-glass-confirm" id="relationModalConfirm">确认</button>
+    </div>
+  </div>
+</div>
+
 <!-- Lightbox -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox()">
   <img id="lightboxImg" src="" alt="">
@@ -1264,6 +1392,7 @@ function getDefaultData() {
     activeCategory: null,
     albums: [],
     storylines: [],
+    relationships: [],
     nextId: 1
   };
 }
@@ -2155,12 +2284,119 @@ function timeAgo(ts) {
   return new Date(ts).toLocaleDateString('zh-CN');
 }
 
+// ==================== Relationships ====================
+function getRelations() {
+  if (!appData.relationships) appData.relationships = [];
+  return appData.relationships;
+}
+
+function renderRelations() {
+  const relations = getRelations();
+  const grid = document.getElementById('relationGrid');
+  const empty = document.getElementById('relationEmpty');
+
+  if (!grid) return;
+
+  if (relations.length === 0) {
+    grid.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  grid.innerHTML = relations.map(r => {
+    return `<div class="relation-card">
+      <div class="rel-actions" onclick="event.stopPropagation();">
+        <button title="编辑" onclick="editRelation(${r.id})">&#9998;</button>
+        <button class="btn-del" title="删除" onclick="deleteRelation(${r.id})">&#128465;</button>
+      </div>
+      <div class="rel-top">
+        <span class="rel-char1">${escHtml(r.char1)}</span>
+        <span class="rel-arrow">&#10084;</span>
+        <span class="rel-char2">${escHtml(r.char2)}</span>
+      </div>
+      <div class="rel-type">${escHtml(r.type)}</div>
+      ${r.desc ? `<div class="rel-desc">${escHtml(r.desc)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function addRelation() {
+  document.getElementById('relationModalTitle').innerHTML = '&#128141; 新建人物关系';
+  document.getElementById('relChar1Field').value = '';
+  document.getElementById('relChar2Field').value = '';
+  document.getElementById('relTypeField').value = '';
+  document.getElementById('relDescField').value = '';
+
+  document.getElementById('relationModalConfirm').onclick = () => {
+    const char1 = document.getElementById('relChar1Field').value.trim();
+    const char2 = document.getElementById('relChar2Field').value.trim();
+    const type = document.getElementById('relTypeField').value.trim();
+    const desc = document.getElementById('relDescField').value;
+    if (!char1 || !char2) { showToast('请填写两个角色名称'); return; }
+    if (!type) { showToast('请填写关系类型'); return; }
+
+    if (!appData.relationships) appData.relationships = [];
+    appData.relationships.push({
+      id: genId(), char1, char2, type, desc,
+      createdAt: Date.now()
+    });
+    saveData();
+    closeModal('relationModal');
+    renderRelations();
+    showToast('关系已添加');
+  };
+  openModal('relationModal');
+}
+
+function editRelation(id) {
+  const r = getRelations().find(x => x.id === id);
+  if (!r) return;
+
+  document.getElementById('relationModalTitle').innerHTML = '&#9998; 编辑人物关系';
+  document.getElementById('relChar1Field').value = r.char1;
+  document.getElementById('relChar2Field').value = r.char2;
+  document.getElementById('relTypeField').value = r.type;
+  document.getElementById('relDescField').value = r.desc || '';
+
+  document.getElementById('relationModalConfirm').onclick = () => {
+    const char1 = document.getElementById('relChar1Field').value.trim();
+    const char2 = document.getElementById('relChar2Field').value.trim();
+    const type = document.getElementById('relTypeField').value.trim();
+    const desc = document.getElementById('relDescField').value;
+    if (!char1 || !char2) { showToast('请填写两个角色名称'); return; }
+    if (!type) { showToast('请填写关系类型'); return; }
+
+    r.char1 = char1;
+    r.char2 = char2;
+    r.type = type;
+    r.desc = desc;
+    saveData();
+    closeModal('relationModal');
+    renderRelations();
+    showToast('关系已更新');
+  };
+  openModal('relationModal');
+}
+
+function deleteRelation(id) {
+  const r = getRelations().find(x => x.id === id);
+  if (!r) return;
+  showConfirm('删除关系', `确定要删除「${r.char1}」与「${r.char2}」的关系吗？`, () => {
+    appData.relationships = getRelations().filter(x => x.id !== id);
+    saveData();
+    renderRelations();
+    showToast('关系已删除');
+  });
+}
+
 // ==================== Init ====================
 renderCategories();
 renderAlbums();
 renderStorylines();
 renderAvatar();
 renderPersonas();
+renderRelations();
 // Keyboard shortcut: Escape to close modals
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
@@ -2204,6 +2440,7 @@ function switchTab(tabId, btn) {
   if (tabId === 'mainView') {
     renderAlbums();
     renderStorylines();
+    renderRelations();
   } else if (tabId === 'profileView') {
     renderProfile();
   }
@@ -2335,26 +2572,6 @@ function renderPersonas() {
           <div class="persona-text" id="personaText${p.id}">${escHtml(p.text || '')}</div>
           ${isLong ? `<button class="btn-expand" onclick="togglePersonaExpand(${p.id})">展开全部</button>` : ''}
           ${linkedNames ? `<div class="persona-linked">&#128279; 关联故事线: ${escHtml(linkedNames)}</div>` : ''}
-        </div>`;
-      }).join('');
-    }
-  }
-
-  // Render persona mini cards in mainView
-  const row = document.getElementById('personaCardsRow');
-  if (row) {
-    if (!profile.personas || profile.personas.length === 0) {
-      row.innerHTML = '<div class="persona-empty-hint">还没有人设，点击「+ 添加」创建</div>';
-    } else {
-      row.innerHTML = profile.personas.map(p => {
-        const preview = (p.text || '').substring(0, 80);
-        return `<div class="persona-mini glass-sm" onclick="viewPersona(${p.id})">
-          <div class="pm-name">${escHtml(p.name)}</div>
-          <div class="pm-preview">${escHtml(preview)}</div>
-          <div class="pm-actions" onclick="event.stopPropagation();">
-            <button onclick="editPersona(${p.id})">&#9998;</button>
-            <button class="btn-del" onclick="deletePersona(${p.id})">&#128465;</button>
-          </div>
         </div>`;
       }).join('');
     }
@@ -2539,6 +2756,7 @@ goBack = function() {
 
   renderAlbums();
   renderStorylines();
+  renderRelations();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 

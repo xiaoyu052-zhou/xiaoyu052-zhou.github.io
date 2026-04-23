@@ -1124,17 +1124,43 @@ button:hover, .btn-confirm:hover, .btn-cancel:hover,
   min-height: 200px;
 }
 .relation-worldview-block {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
 }
 .relation-wv-title {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 10px; padding: 8px 14px;
+  padding: 10px 14px; cursor: pointer;
   background: rgba(255,255,255,0.04);
-  border-radius: 10px;
+  transition: background 0.2s;
+  user-select: none;
+}
+.relation-wv-title:hover {
+  background: rgba(255,255,255,0.08);
+}
+.relation-wv-left {
+  display: flex; align-items: center; gap: 8px;
+}
+.relation-wv-arrow {
+  display: inline-block; font-size: 0.7em;
+  transition: transform 0.3s ease;
+  color: var(--text-secondary);
+}
+.relation-worldview-block.open .relation-wv-arrow {
+  transform: rotate(90deg);
 }
 .relation-wv-name {
   font-size: 0.92em; font-weight: 500; letter-spacing: 1px;
   color: var(--accent-purple);
+}
+.relation-wv-count {
+  font-size: 0.72em; color: var(--text-secondary);
+  margin-left: 6px;
+}
+.relation-wv-actions {
+  display: flex; gap: 2px;
 }
 .relation-wv-actions button {
   background: none; border: none; color: var(--text-secondary);
@@ -1143,6 +1169,15 @@ button:hover, .btn-confirm:hover, .btn-cancel:hover,
 }
 .relation-wv-actions button:hover { background: rgba(255,255,255,0.1); color: #fff; }
 .relation-wv-actions .btn-del:hover { color: var(--danger); }
+.relation-wv-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  padding: 0 14px;
+}
+.relation-worldview-block.open .relation-wv-body {
+  max-height: 600px;
+  padding: 10px 14px 14px;
+}
 .relation-net-svg {
   width: 100%; min-height: 180px;
 }
@@ -2015,53 +2050,62 @@ function saveData() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
   } catch (e) {
-    // localStorage full — try trimming oldest image data to free space
-    console.warn('localStorage full, attempting cleanup...', e);
-    trimImageStorage();
+    console.warn('saveData failed, trying ensureSave:', e);
+    ensureSave();
+  }
+}
+
+function ensureSave() {
+  const MAX_STORAGE = 4.5 * 1024 * 1024; // Target under 4.5MB (limit ~5MB)
+  for (let attempt = 0; attempt < 5; attempt++) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-    } catch (e2) {
-      console.error('Failed to save even after cleanup:', e2);
-      showToast('存储空间不足，部分数据可能未保存');
+      const json = JSON.stringify(appData);
+      if (json.length <= MAX_STORAGE) {
+        localStorage.setItem(STORAGE_KEY, json);
+        return; // Success
+      }
+    } catch (e) {
+      // Will shrink below
     }
+    // Storage too full — shrink the largest image in this album
+    if (!shrinkLargestImage()) break; // No more images to shrink
+  }
+  // Final try
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+  } catch (e) {
+    showToast('存储空间不足，部分图片可能未保存');
   }
 }
 
-// Remove oldest/largest image data to free localStorage space
-function trimImageStorage() {
-  let freed = 0;
-  // Collect all images across all albums
-  const allImages = [];
+// Find and re-compress the largest image to a smaller size
+function shrinkLargestImage() {
+  let biggest = null;
   appData.albums.forEach(album => {
-    if (album.images) {
-      album.images.forEach((img, idx) => {
-        allImages.push({ album, idx, size: (img.data || '').length });
-      });
-    }
+    if (!album.images) return;
+    album.images.forEach(img => {
+      if (img.data && (!biggest || img.data.length > biggest.data.length)) {
+        biggest = img;
+      }
+    });
   });
-  // Sort by size descending — trim largest first
-  allImages.sort((a, b) => b.size - a.size);
-  // Replace the largest 20% with tiny placeholders
-  const trimCount = Math.max(1, Math.ceil(allImages.length * 0.2));
-  for (let i = 0; i < trimCount && i < allImages.length; i++) {
-    const item = allImages[i];
-    const img = item.album.images[item.idx];
-    if (img && img.data && img.data.length > 5000) {
-      freed += img.data.length;
-      // Create a tiny colored placeholder
-      img.data = createPlaceholderData(item.album.name);
-    }
-  }
-  console.log(`Trimmed ${trimCount} images, freed ~${(freed / 1024 / 1024).toFixed(1)}MB`);
-}
+  if (!biggest || biggest.data.length < 2000) return false;
 
-function createPlaceholderData(name) {
-  const c = document.createElement('canvas');
-  c.width = 2; c.height = 2;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle = '#b39ddb';
-  ctx.fillRect(0, 0, 2, 2);
-  return c.toDataURL('image/png');
+  // Re-compress at lower quality
+  try {
+    const img = new Image();
+    img.src = biggest.data;
+    if (img.width === 0) return false;
+    const newW = Math.round(img.width * 0.6);
+    const newH = Math.round(img.height * 0.6);
+    const c = document.createElement('canvas');
+    c.width = newW; c.height = newH;
+    c.getContext('2d').drawImage(img, 0, 0, newW, newH);
+    biggest.data = c.toDataURL('image/jpeg', 0.5);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 let appData = loadData();
@@ -2375,37 +2419,20 @@ function handleFiles(files) {
 
   let processed = 0;
   const total = fileArr.length;
-  let hasError = false;
 
   fileArr.forEach(file => {
     compressImage(file, (compressedData) => {
-      try {
-        album.images.push({
-          name: file.name,
-          data: compressedData,
-          addedAt: Date.now()
-        });
-      } catch (e) {
-        hasError = true;
-        console.error('Failed to push image:', e);
-      }
+      album.images.push({
+        name: file.name,
+        data: compressedData,
+        addedAt: Date.now()
+      });
       processed++;
+      // After each image, try to save. If full, shrink last image and retry.
       if (processed === total) {
-        saveData();
+        ensureSave();
         renderAlbumImages();
-        if (hasError) {
-          showToast('部分图片处理失败，请重试');
-        } else {
-          showToast(`${total} 张图片已上传`);
-        }
-      }
-    }, () => {
-      // Error fallback — even on error, count it so we don't hang
-      processed++;
-      if (processed === total) {
-        saveData();
-        renderAlbumImages();
-        showToast(`${processed} 张已处理（部分可能失败）`);
+        showToast(`${total} 张图片已上传`);
       }
     });
   });
@@ -2413,10 +2440,7 @@ function handleFiles(files) {
 
 function compressImage(file, callback, onError) {
   const reader = new FileReader();
-  reader.onerror = () => {
-    // FileReader failed
-    if (onError) onError();
-  };
+  reader.onerror = () => { if (onError) onError(); };
   reader.onload = (e) => {
     const img = new Image();
     img.onload = () => {
@@ -2440,25 +2464,29 @@ function compressImage(file, callback, onError) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
 
-        const dataUrl = canvas.toDataURL('image/jpeg', QUALITY);
-        const finalData = (file.type === 'image/png' && dataUrl.length > e.target.result.length * 0.8)
-          ? canvas.toDataURL('image/png', 0.8)
-          : dataUrl;
+        // Use JPEG for smaller size; only use PNG for transparent images
+        let finalData;
+        if (file.type === 'image/png') {
+          const jpeg = canvas.toDataURL('image/jpeg', QUALITY);
+          const png = canvas.toDataURL('image/png', 0.8);
+          finalData = jpeg.length < png.length ? jpeg : png;
+        } else {
+          finalData = canvas.toDataURL('image/jpeg', QUALITY);
+        }
 
-        // Free memory
+        // Free memory immediately
         canvas.width = 1;
         canvas.height = 1;
         img.src = '';
 
         callback(finalData);
-      } catch (e) {
-        // Canvas compression failed, use original
-        console.warn('Compression failed, using original:', e);
+      } catch (err) {
+        // Canvas failed — use original data
         callback(e.target.result);
       }
     };
     img.onerror = () => {
-      // Image decode failed, try raw dataURL as last resort
+      // Can't decode — use raw dataURL
       callback(e.target.result);
     };
     img.src = e.target.result;
@@ -3156,18 +3184,32 @@ function renderRelations() {
       svgContent += `</g>`;
     });
 
-    html += `<div class="relation-worldview-block">
-      <div class="relation-wv-title">
-        <span class="relation-wv-name">&#127757; ${escHtml(wv)}</span>
-        <span class="relation-wv-actions">${rels.map(r =>
-          `<button title="编辑" onclick="editRelation(${r.id})">&#9998;</button><button class="btn-del" title="删除" onclick="deleteRelation(${r.id})">&#128465;</button>`
-        ).join('')}</span>
+    // Actions: edit/delete buttons for each relation
+    const actionsHtml = rels.map(r =>
+      `<button title="编辑" onclick="event.stopPropagation();editRelation(${r.id})">&#9998;</button><button class="btn-del" title="删除" onclick="event.stopPropagation();deleteRelation(${r.id})">&#128465;</button>`
+    ).join('');
+
+    html += `<div class="relation-worldview-block" data-wv="${escHtml(wv)}">
+      <div class="relation-wv-title" onclick="toggleWvBlock(this)">
+        <div class="relation-wv-left">
+          <span class="relation-wv-arrow">&#9654;</span>
+          <span class="relation-wv-name">&#127757; ${escHtml(wv)}</span>
+          <span class="relation-wv-count">${rels.length}条关系 · ${chars.length}人</span>
+        </div>
+        <span class="relation-wv-actions" onclick="event.stopPropagation();">${actionsHtml}</span>
       </div>
-      <svg class="rel-net-svg" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>
+      <div class="relation-wv-body">
+        <svg class="rel-net-svg" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">${svgContent}</svg>
+      </div>
     </div>`;
   });
 
   grid.innerHTML = html;
+}
+
+function toggleWvBlock(titleEl) {
+  const block = titleEl.closest('.relation-worldview-block');
+  if (block) block.classList.toggle('open');
 }
 
 function editRelationByChar(charName, worldview) {
@@ -3246,8 +3288,11 @@ function editRelation(id) {
 function updateWorldviewDatalist() {
   const dl = document.getElementById('worldviewList');
   if (!dl) return;
-  const wvs = [...new Set(getRelations().map(r => r.worldview).filter(Boolean))];
-  dl.innerHTML = wvs.map(w => `<option value="${escHtml(w)}">`).join('');
+  // Merge worldviews from two sources: relations and worldview component
+  const fromRelations = getRelations().map(r => r.worldview).filter(Boolean);
+  const fromWorldviews = getWorldviews().map(w => w.name).filter(Boolean);
+  const all = [...new Set([...fromRelations, ...fromWorldviews])];
+  dl.innerHTML = all.map(w => `<option value="${escHtml(w)}">`).join('');
 }
 
 function deleteRelation(id) {

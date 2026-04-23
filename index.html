@@ -1535,6 +1535,25 @@ button:hover, .btn-confirm:hover, .btn-cancel:hover,
 </style>
 </head>
 <body>
+<!-- CRITICAL: Cover page handler - runs independently before any other scripts -->
+<script>
+document.body.style.overflow = 'hidden';
+function _coverEnter() {
+  var c = document.getElementById('coverPage');
+  if (!c) return;
+  c.style.pointerEvents = 'none';
+  c.classList.add('hidden');
+  document.body.style.overflow = '';
+  document.body.style.overflowX = 'hidden';
+  var mv = document.getElementById('mainView');
+  if (mv) mv.classList.add('active');
+  var bar = document.querySelector('.bottom-bar');
+  if (bar) bar.style.display = 'flex';
+  setTimeout(function() {
+    if (c && c.parentNode) c.parentNode.removeChild(c);
+  }, 900);
+}
+</script>
 
 <!-- Background Orbs -->
 <div class="bg-orbs">
@@ -1653,7 +1672,7 @@ button:hover, .btn-confirm:hover, .btn-cancel:hover,
   </div>
 
   <!-- Enter Button -->
-  <button class="cover-enter-btn" onclick="enterApp()">进入你与ta的世界</button>
+  <button class="cover-enter-btn" id="coverEnterBtn" onclick="_coverEnter()">进入你与ta的世界</button>
 </div>
 
 <!-- ==================== MAIN VIEW ==================== -->
@@ -2013,65 +2032,49 @@ button:hover, .btn-confirm:hover, .btn-cancel:hover,
 <!-- Toast -->
 <div id="toast" class="toast"></div>
 <script>
-// ==================== Cover Page ====================
-(function() {
-  // Generate random background stars
-  const starsContainer = document.getElementById('coverStars');
-  if (starsContainer) {
-    for (let i = 0; i < 80; i++) {
-      const star = document.createElement('div');
-      star.className = 'cover-star';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      star.style.setProperty('--dur', (2 + Math.random() * 3) + 's');
-      star.style.animationDelay = (Math.random() * 4) + 's';
-      star.style.width = (1 + Math.random() * 2.5) + 'px';
-      star.style.height = star.style.width;
-      starsContainer.appendChild(star);
-    }
+// ==================== Cover Page (backup binding) ====================
+// The primary handler is _coverEnter() in the <body> inline script.
+// This also re-renders data after cover is dismissed.
+
+function bindCoverBtn() {
+  var btn = document.getElementById('coverEnterBtn');
+  if (btn) {
+    btn.addEventListener('click', function() {
+      // Re-render data after a short delay (cover transition)
+      setTimeout(function() {
+        try { if (typeof renderAlbums === 'function') renderAlbums(); } catch(e) {}
+        try { if (typeof renderStorylines === 'function') renderStorylines(); } catch(e) {}
+        try { if (typeof renderRelations === 'function') renderRelations(); } catch(e) {}
+      }, 200);
+    });
   }
-})();
-
-function enterApp() {
-  const cover = document.getElementById('coverPage');
-  if (!cover) return;
-
-  // Prevent double-click
-  cover.style.pointerEvents = 'none';
-
-  // Trigger fade-out transition
-  cover.classList.add('hidden');
-
-  setTimeout(() => {
-    // Fully remove cover from DOM
-    cover.style.display = 'none';
-
-    // Unlock body scroll
-    document.body.style.overflow = '';
-    document.body.style.overflowX = 'hidden';
-
-    // Force switch to mainView and ensure it's visible
-    const mainView = document.getElementById('mainView');
-    if (mainView) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      mainView.classList.add('active');
-    }
-
-    // Ensure bottom bar is visible
-    const bar = document.querySelector('.bottom-bar');
-    if (bar) bar.style.display = 'flex';
-
-    // Scroll to top
-    window.scrollTo(0, 0);
-
-    // Re-render main content
-    if (typeof renderAlbums === 'function') renderAlbums();
-    if (typeof renderStorylines === 'function') renderStorylines();
-    if (typeof renderRelations === 'function') renderRelations();
-  }, 850);
 }
-// Prevent scroll when cover is visible
-document.body.style.overflow = 'hidden';
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bindCoverBtn);
+} else {
+  bindCoverBtn();
+}
+
+// Generate random background stars
+(function() {
+  try {
+    var starsContainer = document.getElementById('coverStars');
+    if (starsContainer) {
+      for (var i = 0; i < 80; i++) {
+        var star = document.createElement('div');
+        star.className = 'cover-star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.setProperty('--dur', (2 + Math.random() * 3) + 's');
+        star.style.animationDelay = (Math.random() * 4) + 's';
+        star.style.width = (1 + Math.random() * 2.5) + 'px';
+        star.style.height = star.style.width;
+        starsContainer.appendChild(star);
+      }
+    }
+  } catch(e) { console.warn('stars init error:', e); }
+})();
 
 // ==================== Data Layer ====================
 const STORAGE_KEY = 'loveNotesData';
@@ -2475,13 +2478,15 @@ function deleteImage(idx) {
 
 // File upload
 const uploadZone = document.getElementById('uploadZone');
-uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-uploadZone.addEventListener('dragleave', () => { uploadZone.classList.remove('dragover'); });
-uploadZone.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadZone.classList.remove('dragover');
-  handleFiles(e.dataTransfer.files);
-});
+if (uploadZone) {
+  uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => { uploadZone.classList.remove('dragover'); });
+  uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    handleFiles(e.dataTransfer.files);
+  });
+}
 
 function handleFiles(files) {
   const album = appData.albums.find(a => a.id === currentAlbumId);

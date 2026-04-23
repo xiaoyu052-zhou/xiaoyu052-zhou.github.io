@@ -2272,11 +2272,19 @@ function renderAlbumImages() {
     return;
   }
   grid.innerHTML = album.images.map((img, idx) => `
-    <div class="img-item glass-sm">
-      <img src="${img.data}" alt="${escHtml(img.name)}" onclick="openLightbox('${img.data.replace(/'/g, "\\'")}')">
+    <div class="img-item glass-sm" data-img-idx="${idx}">
+      <img src="${img.data}" alt="${escHtml(img.name)}" loading="lazy">
       <button class="img-delete" onclick="event.stopPropagation();deleteImage(${idx})">&times;</button>
     </div>
   `).join('');
+
+  // Use event delegation for lightbox instead of inline base64 in onclick
+  grid.onclick = (e) => {
+    const item = e.target.closest('.img-item');
+    if (!item || e.target.closest('.img-delete')) return;
+    const img = item.querySelector('img');
+    if (img) openLightbox(img.src);
+  };
 }
 
 function deleteImage(idx) {
@@ -2303,21 +2311,70 @@ function handleFiles(files) {
   if (!album) return;
   if (!album.images) album.images = [];
 
-  Array.from(files).forEach(file => {
-    if (!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
+  const fileArr = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (fileArr.length === 0) return;
+  showToast(`正在处理 ${fileArr.length} 张图片...`);
+
+  let processed = 0;
+  fileArr.forEach(file => {
+    compressImage(file, (compressedData) => {
       album.images.push({
         name: file.name,
-        data: e.target.result,
+        data: compressedData,
         addedAt: Date.now()
       });
-      saveData();
-      renderAlbumImages();
-    };
-    reader.readAsDataURL(file);
+      processed++;
+      // Only save and render after all files are processed
+      if (processed === fileArr.length) {
+        saveData();
+        renderAlbumImages();
+        showToast(`${fileArr.length} 张图片已上传`);
+      }
+    });
   });
-  showToast('正在上传...');
+}
+
+// Compress image using Canvas, return base64 with reduced size
+function compressImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX_W = 1200;
+      const MAX_H = 1200;
+      const QUALITY = 0.7; // JPEG quality
+
+      let w = img.width;
+      let h = img.height;
+
+      // Only scale down if larger than max
+      if (w > MAX_W || h > MAX_H) {
+        const ratio = Math.min(MAX_W / w, MAX_H / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // Try JPEG for photos, fallback for transparent PNGs
+      const dataUrl = canvas.toDataURL('image/jpeg', QUALITY);
+      // If the original is PNG with transparency and JPEG bloats it, keep PNG
+      const finalData = (file.type === 'image/png' && dataUrl.length > e.target.result.length * 0.8)
+        ? canvas.toDataURL('image/png', 0.8)
+        : dataUrl;
+      callback(finalData);
+    };
+    img.onerror = () => {
+      // Fallback: use original if Canvas fails
+      callback(e.target.result);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 // Lightbox
@@ -3372,15 +3429,37 @@ function handleAvatarUpload(files) {
   if (!files || !files[0]) return;
   const file = files[0];
   if (!file.type.startsWith('image/')) return;
+  showToast('正在处理头像...');
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
+  compressAvatar(file, (compressedData) => {
     const profile = getProfile();
-    profile.avatar = e.target.result;
+    profile.avatar = compressedData;
     saveData();
     renderAvatar();
     renderProfile();
     showToast('头像已更新');
+  });
+}
+
+function compressAvatar(file, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const SIZE = 200; // Avatar max dimension
+      let w = img.width, h = img.height;
+      if (w > SIZE || h > SIZE) {
+        const ratio = Math.min(SIZE / w, SIZE / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.onerror = () => callback(e.target.result);
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }

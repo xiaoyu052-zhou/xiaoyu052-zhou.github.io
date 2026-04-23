@@ -2012,7 +2012,56 @@ function loadData() {
 }
 
 function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+  } catch (e) {
+    // localStorage full — try trimming oldest image data to free space
+    console.warn('localStorage full, attempting cleanup...', e);
+    trimImageStorage();
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+    } catch (e2) {
+      console.error('Failed to save even after cleanup:', e2);
+      showToast('存储空间不足，部分数据可能未保存');
+    }
+  }
+}
+
+// Remove oldest/largest image data to free localStorage space
+function trimImageStorage() {
+  let freed = 0;
+  // Collect all images across all albums
+  const allImages = [];
+  appData.albums.forEach(album => {
+    if (album.images) {
+      album.images.forEach((img, idx) => {
+        allImages.push({ album, idx, size: (img.data || '').length });
+      });
+    }
+  });
+  // Sort by size descending — trim largest first
+  allImages.sort((a, b) => b.size - a.size);
+  // Replace the largest 20% with tiny placeholders
+  const trimCount = Math.max(1, Math.ceil(allImages.length * 0.2));
+  for (let i = 0; i < trimCount && i < allImages.length; i++) {
+    const item = allImages[i];
+    const img = item.album.images[item.idx];
+    if (img && img.data && img.data.length > 5000) {
+      freed += img.data.length;
+      // Create a tiny colored placeholder
+      img.data = createPlaceholderData(item.album.name);
+    }
+  }
+  console.log(`Trimmed ${trimCount} images, freed ~${(freed / 1024 / 1024).toFixed(1)}MB`);
+}
+
+function createPlaceholderData(name) {
+  const c = document.createElement('canvas');
+  c.width = 2; c.height = 2;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#b39ddb';
+  ctx.fillRect(0, 0, 2, 2);
+  return c.toDataURL('image/png');
 }
 
 let appData = loadData();
@@ -2269,22 +2318,31 @@ function renderAlbumImages() {
   const grid = document.getElementById('imageGrid');
   if (!album.images || album.images.length === 0) {
     grid.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128444;</div><div>还没有图片，点击下方上传</div></div>';
+    grid.onclick = null;
     return;
   }
-  grid.innerHTML = album.images.map((img, idx) => `
-    <div class="img-item glass-sm" data-img-idx="${idx}">
-      <img src="${img.data}" alt="${escHtml(img.name)}" loading="lazy">
+  grid.innerHTML = album.images.map((img, idx) => {
+    const safeName = escHtml(img.name).replace(/'/g, '&#39;');
+    return `<div class="img-item glass-sm" data-img-idx="${idx}">
+      <img src="${img.data}" alt="${safeName}" loading="lazy" decoding="async"
+           onerror="this.style.display='none'">
       <button class="img-delete" onclick="event.stopPropagation();deleteImage(${idx})">&times;</button>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
-  // Use event delegation for lightbox instead of inline base64 in onclick
-  grid.onclick = (e) => {
-    const item = e.target.closest('.img-item');
-    if (!item || e.target.closest('.img-delete')) return;
-    const img = item.querySelector('img');
-    if (img) openLightbox(img.src);
-  };
+  // Event delegation for lightbox (bind once)
+  if (!grid._lightboxBound) {
+    grid._lightboxBound = true;
+    grid.addEventListener('click', (e) => {
+      if (e.target.closest('.img-delete')) return;
+      const item = e.target.closest('.img-item');
+      if (!item) return;
+      const img = item.querySelector('img');
+      if (img && img.src && img.style.display !== 'none') {
+        openLightbox(img.src);
+      }
+    });
+  }
 }
 
 function deleteImage(idx) {
@@ -2316,60 +2374,91 @@ function handleFiles(files) {
   showToast(`正在处理 ${fileArr.length} 张图片...`);
 
   let processed = 0;
+  const total = fileArr.length;
+  let hasError = false;
+
   fileArr.forEach(file => {
     compressImage(file, (compressedData) => {
-      album.images.push({
-        name: file.name,
-        data: compressedData,
-        addedAt: Date.now()
-      });
+      try {
+        album.images.push({
+          name: file.name,
+          data: compressedData,
+          addedAt: Date.now()
+        });
+      } catch (e) {
+        hasError = true;
+        console.error('Failed to push image:', e);
+      }
       processed++;
-      // Only save and render after all files are processed
-      if (processed === fileArr.length) {
+      if (processed === total) {
         saveData();
         renderAlbumImages();
-        showToast(`${fileArr.length} 张图片已上传`);
+        if (hasError) {
+          showToast('部分图片处理失败，请重试');
+        } else {
+          showToast(`${total} 张图片已上传`);
+        }
+      }
+    }, () => {
+      // Error fallback — even on error, count it so we don't hang
+      processed++;
+      if (processed === total) {
+        saveData();
+        renderAlbumImages();
+        showToast(`${processed} 张已处理（部分可能失败）`);
       }
     });
   });
 }
 
-// Compress image using Canvas, return base64 with reduced size
-function compressImage(file, callback) {
+function compressImage(file, callback, onError) {
   const reader = new FileReader();
+  reader.onerror = () => {
+    // FileReader failed
+    if (onError) onError();
+  };
   reader.onload = (e) => {
     const img = new Image();
     img.onload = () => {
-      const MAX_W = 1200;
-      const MAX_H = 1200;
-      const QUALITY = 0.7; // JPEG quality
+      try {
+        const MAX_W = 1200;
+        const MAX_H = 1200;
+        const QUALITY = 0.7;
 
-      let w = img.width;
-      let h = img.height;
+        let w = img.width;
+        let h = img.height;
 
-      // Only scale down if larger than max
-      if (w > MAX_W || h > MAX_H) {
-        const ratio = Math.min(MAX_W / w, MAX_H / h);
-        w = Math.round(w * ratio);
-        h = Math.round(h * ratio);
+        if (w > MAX_W || h > MAX_H) {
+          const ratio = Math.min(MAX_W / w, MAX_H / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', QUALITY);
+        const finalData = (file.type === 'image/png' && dataUrl.length > e.target.result.length * 0.8)
+          ? canvas.toDataURL('image/png', 0.8)
+          : dataUrl;
+
+        // Free memory
+        canvas.width = 1;
+        canvas.height = 1;
+        img.src = '';
+
+        callback(finalData);
+      } catch (e) {
+        // Canvas compression failed, use original
+        console.warn('Compression failed, using original:', e);
+        callback(e.target.result);
       }
-
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-
-      // Try JPEG for photos, fallback for transparent PNGs
-      const dataUrl = canvas.toDataURL('image/jpeg', QUALITY);
-      // If the original is PNG with transparency and JPEG bloats it, keep PNG
-      const finalData = (file.type === 'image/png' && dataUrl.length > e.target.result.length * 0.8)
-        ? canvas.toDataURL('image/png', 0.8)
-        : dataUrl;
-      callback(finalData);
     };
     img.onerror = () => {
-      // Fallback: use original if Canvas fails
+      // Image decode failed, try raw dataURL as last resort
       callback(e.target.result);
     };
     img.src = e.target.result;

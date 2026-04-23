@@ -1117,6 +1117,9 @@ button:hover, .btn-confirm:hover, .btn-cancel:hover,
 .relation-form-group .frosted-input {
   margin-bottom: 0;
 }
+.relation-form-group select.frosted-input option {
+  background: #2d1b69; color: #fff;
+}
 
 /* ========== Relation Network Graph ========== */
 .relation-network-wrap {
@@ -1741,6 +1744,12 @@ button:hover, .btn-confirm:hover, .btn-cancel:hover,
       <div>还没有世界观，点击下方添加</div>
     </div>
     <button class="btn-add-worldview" onclick="addWorldview()">+ 添加世界观</button>
+
+    <div class="section-title">&#128190; 数据备份</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn-glass-confirm" onclick="exportData()" style="flex:1;min-width:120px;">&#128228; 导出备份</button>
+      <button class="btn-glass-cancel" onclick="importData()" style="flex:1;min-width:120px;">&#128229; 导入恢复</button>
+    </div>
   </div>
   <!-- ==================== ALBUM DETAIL VIEW ==================== -->
   <div id="albumView" class="view">
@@ -1905,6 +1914,12 @@ button:hover, .btn-confirm:hover, .btn-cancel:hover,
 <div id="personaModal" class="modal-overlay">
   <div class="modal glass persona-modal" style="max-width:560px;">
     <h3 id="personaModalTitle">&#128221; 新建人设</h3>
+    <div class="relation-form-group">
+      <label>选择分类</label>
+      <select id="personaCategorySelect" class="frosted-input" style="margin-bottom:0;cursor:pointer;">
+        <option value="">全部分类</option>
+      </select>
+    </div>
     <input type="text" id="personaNameField" placeholder="人设名称（如：女主/梦角）" class="frosted-input">
     <textarea id="personaTextField" class="frosted-textarea" placeholder="在这里写下人设描述，字数不限...&#10;&#10;例如：&#10;姓名：&#10;性格：&#10;外貌：&#10;背景故事：&#10;特殊能力："></textarea>
     <div class="btn-row" style="margin-top:20px;">
@@ -1961,6 +1976,12 @@ button:hover, .btn-confirm:hover, .btn-cancel:hover,
 <div id="worldviewModal" class="modal-overlay">
   <div class="modal glass" style="max-width:560px;">
     <h3 id="worldviewModalTitle">&#127757; 新建世界观</h3>
+    <div class="relation-form-group">
+      <label>选择分类</label>
+      <select id="wvCategorySelect" class="frosted-input" style="margin-bottom:0;cursor:pointer;">
+        <option value="">全部分类</option>
+      </select>
+    </div>
     <div class="relation-form-group">
       <label>世界观名称</label>
       <input type="text" id="wvNameField" class="frosted-input" placeholder="如：现代都市、架空魔法世界...">
@@ -2171,6 +2192,29 @@ function showConfirm(title, text, callback) {
   openModal('confirmModal');
 }
 
+// ==================== Category Selection Helper ====================
+function getCategoryOptions() {
+  const cats = [{ id: null, name: '全部分类' }];
+  appData.categories.forEach(c => cats.push({ id: c.id, name: c.name }));
+  return cats;
+}
+
+// Ask user to select a category, then call callback with categoryId
+function askCategory(title, callback) {
+  const cats = getCategoryOptions();
+  if (cats.length <= 1) {
+    // No custom categories, skip selection
+    callback(null);
+    return;
+  }
+  showInputModal(title, '', '', (val) => {
+    const found = appData.categories.find(c => c.name === val);
+    callback(found ? found.id : null);
+  }, {
+    select: cats.map(c => ({ value: c.name, label: c.name }))
+  });
+}
+
 // ==================== Close modals on overlay click ====================
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', (e) => {
@@ -2288,17 +2332,19 @@ function renderAlbums() {
 }
 
 function createAlbum() {
-  showInputModal('新建相册', '输入相册名称...', '', (name) => {
-    appData.albums.push({
-      id: genId(),
-      name,
-      categoryId: currentCategory,
-      images: [],
-      createdAt: Date.now()
+  askCategory('选择分类（可跳过）', (catId) => {
+    showInputModal('新建相册', '输入相册名称...', '', (name) => {
+      appData.albums.push({
+        id: genId(),
+        name,
+        categoryId: catId !== undefined ? catId : currentCategory,
+        images: [],
+        createdAt: Date.now()
+      });
+      saveData();
+      renderAlbums();
+      showToast('相册已创建');
     });
-    saveData();
-    renderAlbums();
-    showToast('相册已创建');
   });
 }
 
@@ -2575,21 +2621,20 @@ function createStoryline(type) {
   const label = type === 'main' ? '主线' : 'IF线';
 
   if (type === 'if') {
-    // Open IF link selection modal first
     openModal('ifLinkModal');
-    // Store the type for later use
     window.pendingStorylineType = 'if';
     return;
   }
 
-  // For main storylines, proceed directly
-  showInputModal(`新建${label}`, `输入${label}名称...`, '', (name) => {
-    const story = {
-      id: genId(),
-      name,
-      type: 'main',
-      categoryId: currentCategory,
-      linkedAlbums: [],
+  // Main: ask category then name
+  askCategory(`选择${label}分类（可跳过）`, (catId) => {
+    showInputModal(`新建${label}`, `输入${label}名称...`, '', (name) => {
+      const story = {
+        id: genId(),
+        name,
+        type: 'main',
+        categoryId: catId !== undefined ? catId : currentCategory,
+        linkedAlbums: [],
       chapters: [],
       isIndependent: false,
       parentId: null,
@@ -2605,13 +2650,14 @@ function confirmIfLine(shouldLink) {
   closeModal('ifLinkModal');
   window.pendingIfShouldLink = shouldLink;
 
-  showInputModal('新建IF线', '输入IF线名称...', '', (name) => {
-    const story = {
-      id: genId(),
-      name,
-      type: 'if',
-      categoryId: currentCategory,
-      linkedAlbums: [],
+  askCategory('选择IF线分类（可跳过）', (catId) => {
+    showInputModal('新建IF线', '输入IF线名称...', '', (name) => {
+      const story = {
+        id: genId(),
+        name,
+        type: 'if',
+        categoryId: catId !== undefined ? catId : currentCategory,
+        linkedAlbums: [],
       chapters: [],
       isIndependent: !shouldLink,
       parentId: null,
@@ -3399,8 +3445,18 @@ function collectWvLinks() {
   return { storyIds, albumIds };
 }
 
+function fillWvCategorySelect(selectedId) {
+  const sel = document.getElementById('wvCategorySelect');
+  if (!sel) return;
+  const cats = getCategoryOptions();
+  sel.innerHTML = cats.map(c =>
+    `<option value="${c.id !== null ? c.id : ''}" ${String(c.id) === String(selectedId) ? 'selected' : ''}>${escHtml(c.name)}</option>`
+  ).join('');
+}
+
 function addWorldview() {
   document.getElementById('worldviewModalTitle').innerHTML = '&#127757; 新建世界观';
+  fillWvCategorySelect(currentCategory);
   document.getElementById('wvNameField').value = '';
   document.getElementById('wvDescField').value = '';
   renderWvLinkOptions([], []);
@@ -3410,9 +3466,12 @@ function addWorldview() {
     const desc = document.getElementById('wvDescField').value;
     if (!name) { showToast('请填写世界观名称'); return; }
     const { storyIds, albumIds } = collectWvLinks();
+    const catVal = document.getElementById('wvCategorySelect').value;
+    const catId = catVal ? parseInt(catVal) : null;
     if (!appData.worldviews) appData.worldviews = [];
     appData.worldviews.push({
       id: genId(), name, desc,
+      categoryId: catId,
       linkedStorylines: storyIds, linkedAlbums: albumIds,
       createdAt: Date.now()
     });
@@ -3428,6 +3487,7 @@ function editWorldview(id) {
   const wv = getWorldviews().find(x => x.id === id);
   if (!wv) return;
   document.getElementById('worldviewModalTitle').innerHTML = '&#9998; 编辑世界观';
+  fillWvCategorySelect(wv.categoryId);
   document.getElementById('wvNameField').value = wv.name;
   document.getElementById('wvDescField').value = wv.desc || '';
   renderWvLinkOptions(wv.linkedStorylines || [], wv.linkedAlbums || []);
@@ -3437,8 +3497,11 @@ function editWorldview(id) {
     const desc = document.getElementById('wvDescField').value;
     if (!name) { showToast('请填写世界观名称'); return; }
     const { storyIds, albumIds } = collectWvLinks();
+    const catVal = document.getElementById('wvCategorySelect').value;
+    const catId = catVal ? parseInt(catVal) : null;
     wv.name = name;
     wv.desc = desc;
+    wv.categoryId = catId;
     wv.linkedStorylines = storyIds;
     wv.linkedAlbums = albumIds;
     saveData();
@@ -3684,14 +3747,26 @@ function togglePersonaExpand(id) {
   }
 }
 
+function fillPersonaCategorySelect(selectedId) {
+  const sel = document.getElementById('personaCategorySelect');
+  if (!sel) return;
+  const cats = getCategoryOptions();
+  sel.innerHTML = cats.map(c =>
+    `<option value="${c.id !== null ? c.id : ''}" ${String(c.id) === String(selectedId) ? 'selected' : ''}>${escHtml(c.name)}</option>`
+  ).join('');
+}
+
 function addPersona() {
   document.getElementById('personaModalTitle').innerHTML = '&#128221; 新建人设';
+  fillPersonaCategorySelect(currentCategory);
   document.getElementById('personaNameField').value = '';
   document.getElementById('personaTextField').value = '';
 
   document.getElementById('personaModalConfirm').onclick = () => {
     const name = document.getElementById('personaNameField').value.trim();
     const text = document.getElementById('personaTextField').value;
+    const catVal = document.getElementById('personaCategorySelect').value;
+    const catId = catVal ? parseInt(catVal) : null;
     if (!name) { showToast('请输入人设名称'); return; }
 
     const profile = getProfile();
@@ -3700,6 +3775,7 @@ function addPersona() {
       id: genId(),
       name,
       text,
+      categoryId: catId,
       createdAt: Date.now()
     });
     saveData();
@@ -3717,20 +3793,24 @@ function editPersona(id) {
   if (!p) return;
 
   document.getElementById('personaModalTitle').innerHTML = '&#9998; 编辑人设';
+  fillPersonaCategorySelect(p.categoryId);
   document.getElementById('personaNameField').value = p.name;
   document.getElementById('personaTextField').value = p.text || '';
 
   document.getElementById('personaModalConfirm').onclick = () => {
     const name = document.getElementById('personaNameField').value.trim();
     const text = document.getElementById('personaTextField').value;
+    const catVal = document.getElementById('personaCategorySelect').value;
+    const catId = catVal ? parseInt(catVal) : null;
     if (!name) { showToast('请输入人设名称'); return; }
 
     p.name = name;
     p.text = text;
+    p.categoryId = catId;
     saveData();
     closeModal('personaModal');
     renderPersonas();
-    renderPersonaLinks(); // update links if editor is open
+    renderPersonaLinks();
     showToast('人设已更新');
   };
   openModal('personaModal');
@@ -3897,6 +3977,95 @@ renderStorylines = function() {
     }
   });
 };
+
+// ==================== Auto-Save ====================
+// Save before page unload (close/refresh/navigate away)
+window.addEventListener('beforeunload', () => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+  } catch(e) {}
+});
+
+// Save when tab becomes hidden (user switches tab)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+    } catch(e) {}
+  }
+});
+
+// Periodic auto-save every 30 seconds
+setInterval(() => {
+  saveData();
+}, 30000);
+
+// ==================== Export / Import Backup ====================
+function exportData() {
+  try {
+    const json = JSON.stringify(appData, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `恋爱手札_备份_${date}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('数据已导出');
+  } catch(e) {
+    showToast('导出失败: ' + e.message);
+  }
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!data.categories && !data.albums && !data.storylines) {
+          showToast('文件格式不正确');
+          return;
+        }
+        showConfirm('导入数据', '导入将覆盖当前所有数据，确定继续吗？', () => {
+          appData = data;
+          // Ensure required fields exist
+          if (!appData.categories) appData.categories = [];
+          if (!appData.albums) appData.albums = [];
+          if (!appData.storylines) appData.storylines = [];
+          if (!appData.relationships) appData.relationships = [];
+          if (!appData.worldviews) appData.worldviews = [];
+          if (!appData.profile) appData.profile = { name: '梦旅人', avatar: '', personas: [] };
+          if (!appData.profile.personas) appData.profile.personas = [];
+          if (!appData.nextId) appData.nextId = Date.now();
+          saveData();
+          // Re-render everything
+          currentCategory = appData.activeCategory;
+          renderCategories();
+          renderAlbums();
+          renderStorylines();
+          renderRelations();
+          renderAvatar();
+          renderPersonas();
+          renderWorldviews();
+          showToast('数据已导入，页面已刷新');
+        });
+      } catch(e) {
+        showToast('解析文件失败');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
 </script>
 </body>
 </html>

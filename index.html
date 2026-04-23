@@ -2035,10 +2035,39 @@ button:hover, .btn-confirm:hover, .btn-cancel:hover,
 function enterApp() {
   const cover = document.getElementById('coverPage');
   if (!cover) return;
+
+  // Prevent double-click
+  cover.style.pointerEvents = 'none';
+
+  // Trigger fade-out transition
   cover.classList.add('hidden');
+
   setTimeout(() => {
+    // Fully remove cover from DOM
     cover.style.display = 'none';
+
+    // Unlock body scroll
     document.body.style.overflow = '';
+    document.body.style.overflowX = 'hidden';
+
+    // Force switch to mainView and ensure it's visible
+    const mainView = document.getElementById('mainView');
+    if (mainView) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      mainView.classList.add('active');
+    }
+
+    // Ensure bottom bar is visible
+    const bar = document.querySelector('.bottom-bar');
+    if (bar) bar.style.display = 'flex';
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+
+    // Re-render main content
+    if (typeof renderAlbums === 'function') renderAlbums();
+    if (typeof renderStorylines === 'function') renderStorylines();
+    if (typeof renderRelations === 'function') renderRelations();
   }, 850);
 }
 // Prevent scroll when cover is visible

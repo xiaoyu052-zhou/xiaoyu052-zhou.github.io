@@ -2032,6 +2032,14 @@ function _coverEnter() {
 <!-- Toast -->
 <div id="toast" class="toast"></div>
 <script>
+// ==================== Global Error Catcher ====================
+window.onerror = function(msg, url, line, col, error) {
+  console.error('GLOBAL ERROR at line ' + line + ': ' + msg);
+  var t = document.getElementById('toast');
+  if (t) { t.textContent = 'JS Error line ' + line + ': ' + msg; t.classList.add('show'); }
+  return false;
+};
+
 // ==================== Cover Page (backup binding) ====================
 // The primary handler is _coverEnter() in the <body> inline script.
 // This also re-renders data after cover is dismissed.
@@ -2669,14 +2677,15 @@ function createStoryline(type) {
         type: 'main',
         categoryId: catId !== undefined ? catId : currentCategory,
         linkedAlbums: [],
-      chapters: [],
-      isIndependent: false,
-      parentId: null,
-      parentChapterId: null,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-    finalizeStorylineCreation(story, '主线');
+        chapters: [],
+        isIndependent: false,
+        parentId: null,
+        parentChapterId: null,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      };
+      finalizeStorylineCreation(story, '主线');
+    });
   });
 }
 
@@ -2692,13 +2701,13 @@ function confirmIfLine(shouldLink) {
         type: 'if',
         categoryId: catId !== undefined ? catId : currentCategory,
         linkedAlbums: [],
-      chapters: [],
-      isIndependent: !shouldLink,
-      parentId: null,
-      parentChapterId: null,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
+        chapters: [],
+        isIndependent: !shouldLink,
+        parentId: null,
+        parentChapterId: null,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      };
 
     if (shouldLink) {
       const mainStories = appData.storylines.filter(s => s.type === 'main' && s.categoryId === currentCategory);
@@ -2727,6 +2736,7 @@ function confirmIfLine(shouldLink) {
     }
 
     finalizeStorylineCreation(story, 'IF线');
+    });
   });
 }
 
@@ -3558,13 +3568,13 @@ function deleteWorldview(id) {
 }
 
 // ==================== Init ====================
-renderCategories();
-renderAlbums();
-renderStorylines();
-renderAvatar();
-renderPersonas();
-renderRelations();
-renderWorldviews();
+try { renderCategories(); } catch(e) { console.error('renderCategories error:', e); }
+try { renderAlbums(); } catch(e) { console.error('renderAlbums error:', e); }
+try { renderStorylines(); } catch(e) { console.error('renderStorylines error:', e); }
+try { renderAvatar(); } catch(e) { console.error('renderAvatar error:', e); }
+try { renderPersonas(); } catch(e) { console.error('renderPersonas error:', e); }
+try { renderRelations(); } catch(e) { console.error('renderRelations error:', e); }
+try { renderWorldviews(); } catch(e) { console.error('renderWorldviews error:', e); }
 // Keyboard shortcut: Escape to close modals
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
@@ -3933,15 +3943,19 @@ function togglePersonaLink(personaId, checked) {
 }
 
 // ==================== Override openStoryline to also render persona links ====================
+try {
 const _origOpenStoryline = openStoryline;
 openStoryline = function(id) {
-  _origOpenStoryline(id);
-  renderPersonaLinks();
+  try { _origOpenStoryline(id); } catch(e) { console.error('openStoryline error:', e); }
+  try { renderPersonaLinks(); } catch(e) { console.error('renderPersonaLinks error:', e); }
 };
+} catch(e) { console.error('openStoryline patch error:', e); }
 
 // ==================== Override goBack to handle tab visibility ====================
+try {
 const _origGoBack = goBack;
 goBack = function() {
+  try {
   // Save content
   if (currentStorylineId && currentChapterId) {
     const s = appData.storylines.find(x => x.id === currentStorylineId);
@@ -3966,11 +3980,15 @@ goBack = function() {
   renderStorylines();
   renderRelations();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch(e) { console.error('goBack error:', e); }
 };
+} catch(e) { console.error('goBack patch error:', e); }
 
 // ==================== Hide bottom bar on sub-views ====================
+try {
 const _origSwitchView = switchView;
 switchView = function(viewId) {
+  try {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(viewId).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3978,15 +3996,19 @@ switchView = function(viewId) {
   // Hide bottom bar on detail views
   const bar = document.querySelector('.bottom-bar');
   if (viewId === 'mainView' || viewId === 'profileView') {
-    bar.style.display = 'flex';
+    if (bar) bar.style.display = 'flex';
   } else {
-    bar.style.display = 'none';
+    if (bar) bar.style.display = 'none';
   }
+  } catch(e) { console.error('switchView error:', e); }
 };
+} catch(e) { console.error('switchView patch error:', e); }
 
 // ==================== Update storyline cards to show linked personas ====================
+try {
 const _origRenderStorylines = renderStorylines;
 renderStorylines = function() {
+  try {
   _origRenderStorylines();
 
   // Append persona info to storyline cards
@@ -4010,7 +4032,9 @@ renderStorylines = function() {
       }
     }
   });
+  } catch(e) { console.error('renderStorylines patch error:', e); }
 };
+} catch(e) { console.error('renderStorylines override error:', e); }
 
 // ==================== Auto-Save ====================
 // Save before page unload (close/refresh/navigate away)
